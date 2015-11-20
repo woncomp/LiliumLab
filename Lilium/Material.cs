@@ -10,6 +10,7 @@ using SharpDX.D3DCompiler;
 
 using Device = SharpDX.Direct3D11.Device;
 using Buffer = SharpDX.Direct3D11.Buffer;
+using System.IO;
 
 namespace Lilium
 {
@@ -152,24 +153,24 @@ namespace Lilium
 				if (string.IsNullOrEmpty(desc.VertexShaderFunction))
 					throw new System.ArgumentException("Vertex shader function name is nessessary in a material.");
 
-				var vertexShaderByteCode = ShaderBytecode.CompileFromFile(filename, desc.VertexShaderFunction, "vs_5_0", ShaderFlags.Debug);
+				var vertexShaderByteCode = CompileShader(filename, desc.VertexShaderFunction, "vs_5_0");
 				VertexShader = new VertexShader(Device, vertexShaderByteCode);
 
 				if (!string.IsNullOrEmpty(desc.PixelShaderFunction))
 				{
-					var pixelShaderByteCode = ShaderBytecode.CompileFromFile(filename, desc.PixelShaderFunction, "ps_5_0", ShaderFlags.Debug);
+					var pixelShaderByteCode = CompileShader(filename, desc.PixelShaderFunction, "ps_5_0");
 					PixelShader = new PixelShader(Device, pixelShaderByteCode);
 				}
 
 				if (!string.IsNullOrEmpty(desc.DomainShaderFunction))
 				{
-					var domainShaderByteCode = ShaderBytecode.CompileFromFile(filename, desc.DomainShaderFunction, "ds_5_0", ShaderFlags.Debug);
+					var domainShaderByteCode = CompileShader(filename, desc.DomainShaderFunction, "ds_5_0");
 					DomainShader = new DomainShader(Device, domainShaderByteCode);
 				}
 
 				if (!string.IsNullOrEmpty(desc.HullShaderFunction))
 				{
-					var hullShaderByteCode = ShaderBytecode.CompileFromFile(filename, desc.HullShaderFunction, "hs_5_0", ShaderFlags.Debug);
+					var hullShaderByteCode = CompileShader(filename, desc.HullShaderFunction, "hs_5_0");
 					HullShader = new HullShader(Device, hullShaderByteCode);
 				}
 
@@ -313,6 +314,64 @@ namespace Lilium
 		public Controls.Control[] Controls
 		{
 			get { return controls; }
+		}
+		#endregion
+
+		#region CompileShader
+		class ShaderInclude : Include
+		{
+			IDisposable shadow;
+			List<IDisposable> toDispose = new List<IDisposable>();
+
+			public void Close(System.IO.Stream stream)
+			{
+				stream.Close();
+				toDispose.Add(stream);
+			}
+
+			public System.IO.Stream Open(IncludeType type, string fileName, System.IO.Stream parentStream)
+			{
+				var filePath = fileName;
+				if (type == IncludeType.Local)
+				{
+					filePath = Game.Instance.ResourceManager.FindValidShaderFilePath(fileName);
+				}
+				else
+				{
+					var SearchPaths = Game.Instance.ResourceManager.SearchPaths;
+					for (int i = SearchPaths.Count - 1; i >= 0; --i)
+					{
+						var folder = Path.Combine(SearchPaths[i], ResourceManager.SUBFOLDER_SHADER);
+						var filePath2 = Path.Combine(folder, fileName);
+						if (File.Exists(filePath2))
+						{
+							filePath = filePath2;
+							break;
+						}
+					}
+				}
+				return new FileStream(filePath, FileMode.Open);
+			}
+
+			public IDisposable Shadow
+			{
+				get { return shadow; }
+				set { shadow = value; }
+			}
+
+			public void Dispose()
+			{
+				foreach (var d in toDispose)
+				{
+					if (d != null) d.Dispose();
+				}
+			}
+		}
+
+		CompilationResult CompileShader(string fileName, string entryPoint, string profile)
+		{
+			return ShaderBytecode.CompileFromFile(fileName, entryPoint, profile, ShaderFlags.Debug, EffectFlags.None,
+				null, new ShaderInclude());
 		}
 		#endregion
 	}

@@ -1,4 +1,4 @@
-#pragma pack_matrix ( row_major )
+#include <Lilium.hlsl>
 
 /*
 		struct ShaderData
@@ -18,27 +18,6 @@
 			data.ambientColor = new Vector4(ambient, ambient, ambient, 1);
 			data.diffuseColor = new Vector4(diffuse, diffuse, diffuse, 1);
 */
-cbuffer LiliumPerFrame : register(b1)
-{
-	float4x4 matView;
-	float4x4 matProjection;
-	float4 lightDir;
-	float4 ambientColor;
-	float4 diffuseColor;
-};
-
-cbuffer LiliumPerObject : register(b2)
-{
-	float4x4 matWorld;
-};
-
-struct VS_IN
-{
-	float4 position : POSITION;
-	float3 normal : NORMAL;
-	float3 tangent : TANGENT;
-	float2 texCoord : TEXCOORD;
-};
 
 struct PS_IN
 {

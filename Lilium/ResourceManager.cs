@@ -128,7 +128,10 @@ namespace Lilium
 						Debug.Log(e.Message);
 					}
 				}
-				Debug.Log("Load resource failed, cannot find " + resName);
+				if (obj == null)
+				{
+					Debug.Log("Load resource failed - " + resName);
+				}
 				return obj;
 			}
 			else

@@ -125,8 +125,8 @@ namespace Lilium
 
 			Camera.MainCamera.Begin();
 			UpdatePerFrameBuffer();
+			OnUpdate();//MTBTODO
 			MainScene.Draw();
-			OnUpdate();
 
 			grid.Draw();
 			Preview_Render();
