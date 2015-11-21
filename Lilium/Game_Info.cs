@@ -79,10 +79,19 @@ namespace Lilium
 			if (selectedObject != null)
 			{
 				var controls = selectedObject.Controls;
-				for (int i = 0; i < controls.Length; ++i)
+				if (controls != null)
 				{
-					AddControl(controls[i]);
-					selectedObjectControls.Add(controls[i]);
+					for (int i = 0; i < controls.Length; ++i)
+					{
+						AddControl(controls[i]);
+						selectedObjectControls.Add(controls[i]);
+					}
+				}
+				else
+				{
+					var c = new Label("Warning", () => "Selected object don't have any control.(" + obj.ToString() + ")");
+					AddControl(c);
+					selectedObjectControls.Add(c);
 				}
 			}
 		}

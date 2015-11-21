@@ -97,6 +97,12 @@
     <Compile Include="Controls\Label.Designer.cs">
       <DependentUpon>Label.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\TextArea.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\TextArea.Designer.cs">
+      <DependentUpon>TextArea.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\ResourceBrowser.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -140,6 +146,7 @@
     <Compile Include="Input.cs" />
     <Compile Include="Material.cs" />
     <Compile Include="MaterialSerializing.cs" />
+    <Compile Include="MaterialVariable.cs" />
     <Compile Include="ResourceManager.cs" />
     <Compile Include="Scene.cs" />
     <Compile Include="InternalResources.cs" />
@@ -166,6 +173,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\Label.resx">
       <DependentUpon>Label.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\TextArea.resx">
+      <DependentUpon>TextArea.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\MaterialEditor.resx">
       <DependentUpon>MaterialEditor.cs</DependentUpon>

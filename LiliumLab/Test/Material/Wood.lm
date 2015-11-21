@@ -2,6 +2,10 @@
   "Passes": [
     {
       "ShaderFile": "Test.hlsl",
+      "VariableValues": {
+        "SomeColor": "1,1,1,1",
+        "TestValue": "0.727;min=0;max=1"
+      },
       "ShaderEntry": {
         "VertexShaderFunction": "VS",
         "PixelShaderFunction": "PS",

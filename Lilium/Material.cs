@@ -55,6 +55,8 @@ namespace Lilium
 
 		public MaterialTextureDesc[] Textures;
 
+		public Dictionary<string, string> VariableValues;
+
 		public bool ManualConstantBuffers = false;
 
 		public MaterialPassDesc()
@@ -74,6 +76,7 @@ namespace Lilium
 			};
 
 			Textures = new MaterialTextureDesc[0];
+			VariableValues = new Dictionary<string, string>();
 		}
 	}
 
@@ -136,6 +139,7 @@ namespace Lilium
 		{
 			IsValid = true;
 			var sb = new StringBuilder();
+			sb.Append("Errors:");
 
 			Passes = new MaterialPass[Desc.Passes.Count];
 			for (int i = 0; i < Passes.Length; ++i)
@@ -144,18 +148,47 @@ namespace Lilium
 				if(!Passes[i].IsValid)
 				{
 					IsValid = false;
-					sb.Append(Passes[i].ErrorMessage);
 					sb.Append('\n');
+					sb.Append("Pass " + i + ":\n");
+					sb.Append(Passes[i].ErrorMessage);
 				}
 			}
 
 			if (IsValid)
 			{
-				CreateControls();
+				DeserializeVariables();
+				ErrorMessage = "";
 			}
 			else
 			{
 				ErrorMessage = sb.ToString();
+			}
+			CreateControls();
+		}
+
+		public void SerializeVariables()
+		{
+			for (int i = 0; i < Passes.Length; ++i)
+			{
+				var pass = Passes[i];
+				if(pass.IsValid)
+				{
+					var dic = new Dictionary<string, string>();
+					pass.SerializeVariables(dic);
+					Desc.Passes[i].VariableValues = dic;
+				}
+			}
+		}
+
+		public void DeserializeVariables()
+		{
+			for (int i = 0; i < Passes.Length; ++i)
+			{
+				var pass = Passes[i];
+				if (pass.IsValid)
+				{
+					pass.DeserializeVariables(Desc.Passes[i].VariableValues);
+				}
 			}
 		}
 
@@ -179,25 +212,32 @@ namespace Lilium
 		void CreateControls()
 		{
 			List<Lilium.Controls.Control> list = new List<Lilium.Controls.Control>();
-			var label = new Lilium.Controls.Label("Error", () => IsValid ? "No Error" : ErrorMessage);
-			list.Add(label);
+			var btn2 = new Lilium.Controls.Button("Reload", Reload);
+			list.Add(btn2);
 			var btn1 = new Lilium.Controls.Button("Edit", () =>
 			{
 				var editor = new MaterialEditor(this);
 				editor.Show();
 			});
 			list.Add(btn1);
-			var btn2 = new Lilium.Controls.Button("Reload", Reload);
-			list.Add(btn2);
-			var btn3 = new Lilium.Controls.Button("Save", () =>
+			if (IsValid)
 			{
-				Game.ResourceManager.Material.Save(this);
-			});
-			list.Add(btn3);
-			for (int i = 0; i < Passes.Length; ++i)
+				var btn3 = new Lilium.Controls.Button("Save", () =>
+				{
+					Game.ResourceManager.Material.Save(this);
+				});
+				list.Add(btn3);
+				for (int i = 0; i < Passes.Length; ++i)
+				{
+					list.Add(new Lilium.Controls.Label("Pass " + i, () => "--------------"));
+					Passes[i].CreateAutoVariableControls(list);
+				}
+			}
+			else
 			{
-				list.Add(new Lilium.Controls.Label("Pass " + i, () => "--------------"));
-				Passes[i].CreateAutoVariableControls(list);
+				var textArea = new Lilium.Controls.TextArea();
+				textArea.Text = ErrorMessage;
+				list.Add(textArea);
 			}
 			controls = list.ToArray();
 		}
@@ -242,11 +282,16 @@ namespace Lilium
 			this.Desc = desc;
 			this.debugName = debugName ?? ("Pass Object " + Debug.NextObjectId);
 
-			IsValid = false;
-			try
+			IsValid = true;
+			var filename = Game.Instance.ResourceManager.FindValidShaderFilePath(desc.ShaderFile);
+			if(filename == null)
 			{
-				autoConstantBuffers = new List<AutoConstantBuffer>();
-				var filename = Game.Instance.ResourceManager.FindValidShaderFilePath(desc.ShaderFile);
+				IsValid = false;
+				ErrorMessage = "Cannot find a shader file with name " + desc.ShaderFile;
+			}
+			if(IsValid) try
+			{
+				autoConstantBuffers = new List<MaterialConstantBuffer>();
 
 				if (string.IsNullOrEmpty(desc.VertexShaderFunction))
 					throw new System.ArgumentException("Vertex shader function name is nessessary in a material.");
@@ -303,12 +348,11 @@ namespace Lilium
 						SamplerStateList[i] = new SamplerState(Device, t.SamplerStates);
 					}
 				}
-				IsValid = true;
 			}
-			catch (Exception e)
+			catch (SharpDX.CompilationException e)
 			{
+				IsValid = false;
 				ErrorMessage = e.Message;
-				Debug.Log(ErrorMessage);
 			}
 		}
 
@@ -356,6 +400,52 @@ namespace Lilium
 				DeviceContext.PixelShader.SetSampler(i, null);
 				DeviceContext.PixelShader.SetShaderResource(i, null);
 			}
+		}
+
+		public void SerializeVariables(Dictionary<string, string> dic)
+		{
+			for (int i = 0; i < autoConstantBuffers.Count; ++i)
+			{
+				var acb = autoConstantBuffers[i];
+				for (int j = 0; j < acb.Variables.Count; ++j)
+				{
+					var variable = acb.Variables[j];
+					if (!variable.Name.StartsWith("__"))
+					{
+						dic[variable.Name] = variable.Serialize();
+					}
+				}
+			}
+		}
+
+		public void DeserializeVariables(Dictionary<string, string> dic)
+		{
+			for (int i = 0; i < autoConstantBuffers.Count; ++i)
+			{
+				var acb = autoConstantBuffers[i];
+				for (int j = 0; j < acb.Variables.Count; ++j)
+				{
+					var variable = acb.Variables[j];
+					if(dic.ContainsKey(variable.Name))
+					{
+						variable.Deserialize(dic[variable.Name]);
+					}
+				}
+			}
+		}
+
+		public MaterialVariable FindVariable(string name)
+		{
+			for (int i = 0; i < autoConstantBuffers.Count; ++i)
+			{
+				var acb = autoConstantBuffers[i];
+				for (int j = 0; j < acb.Variables.Count; ++j)
+				{
+					var variable = acb.Variables[j];
+					if (variable.Name == name) return variable;
+				}
+			}
+			return null;
 		}
 
 		public void Dispose()
@@ -456,192 +546,7 @@ namespace Lilium
 
 		#region Auto Shader Varaiables
 
-		private List<AutoConstantBuffer> autoConstantBuffers = new List<AutoConstantBuffer>();
-
-		class AutoConstantBuffer : IDisposable
-		{
-			public string Name;
-			public List<AutoVariable> Variables = new List<AutoVariable>();
-			public int BindPoint;
-			public int Size;
-
-			public Buffer buffer;
-
-			private Device device;
-
-			public void Init(Device device)
-			{
-				this.device = device;
-
-				var desc = new BufferDescription();
-				desc.BindFlags = BindFlags.ConstantBuffer;
-				desc.CpuAccessFlags = CpuAccessFlags.Write;
-				desc.OptionFlags = ResourceOptionFlags.None;
-				desc.SizeInBytes = Size;
-				desc.StructureByteStride = 0;
-				desc.Usage = ResourceUsage.Dynamic;
-				buffer = new Buffer(device, desc);
-			}
-
-			public void Update()
-			{
-				var dc = device.ImmediateContext;
-				DataStream stream;
-				dc.MapSubresource(buffer, 0, MapMode.WriteDiscard, SharpDX.Direct3D11.MapFlags.None, out stream);
-				int offset = 0;
-				for (int i = 0; i < Variables.Count; ++i)
-				{
-					var v = Variables[i];
-					if (offset < v.StartOffset) stream.Seek(v.StartOffset - offset, SeekOrigin.Current);
-					Variables[i].Write(stream);
-					offset = v.StartOffset + v.Size;
-				}
-				dc.UnmapSubresource(buffer, 0);
-				dc.VertexShader.SetConstantBuffer(BindPoint, buffer);
-				dc.PixelShader.SetConstantBuffer(BindPoint, buffer);
-				dc.HullShader.SetConstantBuffer(BindPoint, buffer);
-				dc.DomainShader.SetConstantBuffer(BindPoint, buffer);
-			}
-
-			public void Dispose()
-			{
-				Utilities.Dispose(ref buffer);
-			}
-		}
-
-		abstract class AutoVariable
-		{
-			public string Name;
-			public int Size;
-			public int StartOffset;
-
-			public AutoVariable(ShaderReflectionVariable v)
-			{
-				Name = v.Description.Name;
-				Size = v.Description.Size;
-				StartOffset = v.Description.StartOffset;
-			}
-
-			public abstract void Write(DataStream stream);
-			public abstract Lilium.Controls.Control CreateControl();
-		}
-
-		class AutoFloatVariable : AutoVariable
-		{
-			public float value = 0;
-			public float maxValue = 1;
-			public float minValue = 0;
-
-			public AutoFloatVariable(ShaderReflectionVariable v) : base(v)
-			{
-				unsafe
-				{
-					float* p = (float*)v.Description.DefaultValue;
-					if (p != null) value = *p;
-				}
-			}
-			public override void Write(DataStream stream) { stream.Write(value); }
-			public override Controls.Control CreateControl()
-			{
-				return new Lilium.Controls.Slider(Name, minValue, maxValue, () => value, val => value = val);
-			}
-		}
-
-		class AutoFloat2Variable : AutoVariable
-		{
-			public Vector2 value = new Vector2();
-
-			public AutoFloat2Variable(ShaderReflectionVariable v)
-				: base(v)
-			{
-				unsafe
-				{
-					Vector2* p = (Vector2*)v.Description.DefaultValue;
-					if (p != null) value = *p;
-				}
-			}
-			public override void Write(DataStream stream) { stream.Write(value); }
-			public override Controls.Control CreateControl()
-			{
-				Debug.Log("Auto control of float2 variable type not implemented.");
-				return null;
-			}
-		}
-
-		class AutoFloat3Variable : AutoVariable
-		{
-			public Vector3 value = new Vector3();
-
-			public AutoFloat3Variable(ShaderReflectionVariable v)
-				: base(v)
-			{
-				unsafe
-				{
-					Vector3* p = (Vector3*)v.Description.DefaultValue;
-					if (p != null) value = *p;
-				}
-			}
-			public override void Write(DataStream stream) { stream.Write(value); }
-			public override Controls.Control CreateControl()
-			{
-				Debug.Log("Auto control of float3 variable type not implemented.");
-				return null;
-			}
-		}
-
-		class AutoFloat4Variable : AutoVariable
-		{
-			public Vector4 value = new Vector4();
-
-			public AutoFloat4Variable(ShaderReflectionVariable v)
-				: base(v)
-			{
-				unsafe
-				{
-					Vector4* p = (Vector4*)v.Description.DefaultValue;
-					if (p != null) value = *p;
-				}
-			}
-			public override void Write(DataStream stream) { stream.Write(value); }
-			public override Controls.Control CreateControl()
-			{
-				Debug.Log("Auto control of float4 variable type not implemented.");
-				return null;
-			}
-		}
-
-		class AutoColorVariable : AutoVariable
-		{
-			public Vector4 value = Vector4.One;
-
-			public AutoColorVariable(ShaderReflectionVariable v)
-				: base(v)
-			{
-				unsafe
-				{
-					Vector4* p = (Vector4*)v.Description.DefaultValue;
-					if (p != null) value = *p;
-				}
-			}
-			public override void Write(DataStream stream) { stream.Write(value); }
-			public override Controls.Control CreateControl()
-			{
-				return new Lilium.Controls.ColorPicker(Name, () => value, val => value = val);
-			}
-		}
-
-		class AutoMatrixVariable : AutoVariable
-		{
-			public Matrix value = Matrix.Identity;
-
-			public AutoMatrixVariable(ShaderReflectionVariable v) : base(v) { }
-			public override void Write(DataStream stream) { stream.Write(value); }
-			public override Controls.Control CreateControl()
-			{
-				Debug.Log("Auto control of matrix variable type not implemented.");
-				return null;
-			}
-		}
+		private List<MaterialConstantBuffer> autoConstantBuffers = new List<MaterialConstantBuffer>();
 
 		void ScanConstantBuffers(ShaderBytecode code)
 		{
@@ -655,7 +560,7 @@ namespace Lilium
 				if (name == "LiliumPerFrame" || name == "LiliumPerObject") continue;
 				if (autoConstantBuffers.Exists(b => b.Name == name)) continue;
 
-				var acb = new AutoConstantBuffer();
+				var acb = new MaterialConstantBuffer();
 				acb.Name = name;
 				acb.Size = constantBuffer.Description.Size;
 					
@@ -672,41 +577,39 @@ namespace Lilium
 				for(int j=0;j<constantBuffer.Description.VariableCount;++j)
 				{
 					var variable = constantBuffer.GetVariable(j);
-					AutoVariable av = null;
+					MaterialVariable av = null;
 					switch (variable.GetVariableType().Description.Class)
 					{
 						case ShaderVariableClass.Scalar:
-							av = new AutoFloatVariable(variable);
+							av = new MaterialFloatVariable(variable);
 							break;
 						case ShaderVariableClass.Vector:
 							switch (variable.Description.Size)
 							{
 								case 8:
-									av = new AutoFloat2Variable(variable);
+									av = new MaterialFloat2Variable(variable);
 									break;
 								case 12:
-									av = new AutoFloat3Variable(variable);
+									av = new MaterialFloat3Variable(variable);
 									break;
 								case 16:
 									if (variable.Description.Name.EndsWith("Color"))
 									{
-										av = new AutoColorVariable(variable);
+										av = new MaterialColorVariable(variable);
 									}
 									else
 									{
-										av = new AutoFloat4Variable(variable);
+										av = new MaterialFloat4Variable(variable);
 									}
 									break;
 								default:
 									throw new Exception("ShaderVariableClass.Vector --> variable.Description.Size");
 							}
 							break;
-						case ShaderVariableClass.MatrixRows:
-							av = new AutoMatrixVariable(variable);
-							break;
-						case ShaderVariableClass.MatrixColumns:
-							av = new AutoMatrixVariable(variable);
-							break;
+						//case ShaderVariableClass.MatrixRows:
+						//	break;
+						//case ShaderVariableClass.MatrixColumns:
+						//	break;
 						//case ShaderVariableClass.InterfaceClass:
 						//	break;
 						//case ShaderVariableClass.InterfacePointer:

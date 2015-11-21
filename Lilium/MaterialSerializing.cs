@@ -73,6 +73,8 @@ namespace Lilium.Serializing
 		public InputElement[] InputElements { get; set; }
 		public MaterialTexture[] Textures { get; set; }
 
+		public Dictionary<string, string> VariableValues;
+
 		public MaterialPass()
 		{
 			ShaderEntry = new ShaderEntry();
@@ -92,6 +94,7 @@ namespace Lilium.Serializing
 			// Other
 			InputElements = InputElement.Import(desc.InputElements);
 			Textures = MaterialTexture.Import(desc.Textures);
+			VariableValues = desc.VariableValues;
 		}
 
 		public void Export(MaterialPassDesc desc)
@@ -105,6 +108,7 @@ namespace Lilium.Serializing
 			// Other
 			desc.InputElements = InputElement.Export(InputElements);
 			desc.Textures = MaterialTexture.Export(Textures);
+			desc.VariableValues = VariableValues ?? new Dictionary<string, string>();
 		}
 	}
 

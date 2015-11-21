@@ -104,16 +104,9 @@ namespace Lilium
 					var filePath = Path.Combine(folder, resName);
 					if (File.Exists(filePath))
 					{
-						try
-						{
-							obj = LoadFunc(mgr.Game.Device, filePath);
-							dic[resName] = obj;
-							break;
-						}
-						catch (Exception e)
-						{
-							Debug.Log(e.Message);
-						}
+						obj = LoadFunc(mgr.Game.Device, filePath);
+						dic[resName] = obj;
+						break;
 					}
 				}
 				if(obj == null)
@@ -168,6 +161,7 @@ namespace Lilium
 
 		public void Save(Material material)
 		{
+			material.SerializeVariables();
 			Save(material.Desc);
 		}
 
