@@ -19,25 +19,27 @@ namespace Lilium
 		public static MaterialDesc Load(string filePath)
 		{
 			var desc = new MaterialDesc();
-			desc.FilePath = filePath;
-			Serializing.Material.Deserialize(desc);
+			Serializing.Material.Deserialize(desc, filePath);
 			return desc;
 		}
 
 		public void Save(string filePath)
 		{
-			this.FilePath = filePath;
-			Save();
+			Serializing.Material.Serialize(this, filePath);
 		}
 
-		public void Save()
+		public string ResourceName;
+		public List<MaterialPassDesc> Passes;
+
+		public MaterialDesc()
 		{
-			Serializing.Material.Serialize(this);
+			Passes = new List<MaterialPassDesc>(1);
+			Passes.Add(new MaterialPassDesc());
 		}
+	}
 
-		public string FilePath;
-		public string DebugName;
-
+	public class MaterialPassDesc
+	{
 		public RasterizerStateDescription RasteriazerStates;
 		public BlendStateDescription BlendStates;
 		public DepthStencilStateDescription DepthStencilStates;
@@ -53,7 +55,9 @@ namespace Lilium
 
 		public MaterialTextureDesc[] Textures;
 
-		public MaterialDesc()
+		public bool ManualConstantBuffers = false;
+
+		public MaterialPassDesc()
 		{
 			RasteriazerStates = RasterizerStateDescription.Default();
 			BlendStates = BlendStateDescription.Default();
@@ -93,44 +97,31 @@ namespace Lilium
 			return new Buffer(Game.Instance.Device, Utilities.SizeOf<T>(), ResourceUsage.Default, BindFlags.ConstantBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
 		}
 
-		public string ResourceName;
 		public MaterialDesc Desc;
 
 		public bool IsValid { get; private set; }
 		public string ErrorMessage { get; private set; }
-
-		public VertexShader VertexShader { get; private set; }
-		public PixelShader PixelShader { get; private set; }
-		public GeometryShader GeometryShader { get; private set; }
-		public DomainShader DomainShader { get; private set; }
-		public HullShader HullShader { get; private set; }
-		public InputLayout Layout { get; private set; }
 
 		public string DebugName
 		{
 			get { return debugName; }
 		}
 
-		public RasterizerState RasterizerState;
-		public BlendState BlendState;
-		public DepthStencilState DepthStencilState;
+		public MaterialPass[] Passes { get; private set; }
 
-		public ShaderResourceView[] TextureList;
-		public SamplerState[] SamplerStateList;
-
-		private Device Device;
-		private DeviceContext DeviceContext;
+		public Device Device { get; private set; }
+		public DeviceContext DeviceContext { get; private set; }
+		public Game Game { get; private set; }
 
 		private string debugName = "";
 
-		public Material(MaterialDesc desc)
+		public Material(Game game, MaterialDesc desc, string debugName = null)
 		{
+			this.Game = game;
+			this.Device = game.Device;
+			this.DeviceContext = game.DeviceContext;
 			this.Desc = desc;
-			this.Device = Game.Instance.Device;
-			this.DeviceContext = Game.Instance.DeviceContext;
-			this.debugName = string.IsNullOrEmpty(desc.DebugName) ?
-				"Material" + Debug.NextObjectId + " " + System.IO.Path.GetFileNameWithoutExtension(desc.FilePath) :
-				desc.DebugName;
+			this.debugName = debugName ?? "Material Object " + Debug.NextObjectId;
 
 			Load();
 		}
@@ -143,7 +134,114 @@ namespace Lilium
 
 		void Load()
 		{
-			var desc = this.Desc;
+			IsValid = true;
+			var sb = new StringBuilder();
+
+			Passes = new MaterialPass[Desc.Passes.Count];
+			for (int i = 0; i < Passes.Length; ++i)
+			{
+				Passes[i] = new MaterialPass(Device, Desc.Passes[i], debugName + " Pass " + i);
+				if(!Passes[i].IsValid)
+				{
+					IsValid = false;
+					sb.Append(Passes[i].ErrorMessage);
+					sb.Append('\n');
+				}
+			}
+
+			if (IsValid)
+			{
+				CreateControls();
+			}
+			else
+			{
+				ErrorMessage = sb.ToString();
+			}
+		}
+
+		public override string ToString()
+		{
+			return debugName;
+		}
+
+		public void Dispose()
+		{
+			for (int i = 0; i < Passes.Length; ++i)
+			{
+				Utilities.Dispose(ref Passes[i]);
+			}
+		}
+
+		#region Selectable
+
+		private Controls.Control[] controls;
+
+		void CreateControls()
+		{
+			List<Lilium.Controls.Control> list = new List<Lilium.Controls.Control>();
+			var label = new Lilium.Controls.Label("Error", () => IsValid ? "No Error" : ErrorMessage);
+			list.Add(label);
+			var btn1 = new Lilium.Controls.Button("Edit", () =>
+			{
+				var editor = new MaterialEditor(this);
+				editor.Show();
+			});
+			list.Add(btn1);
+			var btn2 = new Lilium.Controls.Button("Reload", Reload);
+			list.Add(btn2);
+			var btn3 = new Lilium.Controls.Button("Save", () =>
+			{
+				Game.ResourceManager.Material.Save(this);
+			});
+			list.Add(btn3);
+			for (int i = 0; i < Passes.Length; ++i)
+			{
+				list.Add(new Lilium.Controls.Label("Pass " + i, () => "--------------"));
+				Passes[i].CreateAutoVariableControls(list);
+			}
+			controls = list.ToArray();
+		}
+
+		public Controls.Control[] Controls
+		{
+			get { return controls; }
+		}
+		#endregion
+	}
+
+	public class MaterialPass : IDisposable
+	{
+		public VertexShader VertexShader { get; private set; }
+		public PixelShader PixelShader { get; private set; }
+		public GeometryShader GeometryShader { get; private set; }
+		public DomainShader DomainShader { get; private set; }
+		public HullShader HullShader { get; private set; }
+		public InputLayout Layout { get; private set; }
+
+		public RasterizerState RasterizerState;
+		public BlendState BlendState;
+		public DepthStencilState DepthStencilState;
+
+		public ShaderResourceView[] TextureList;
+		public SamplerState[] SamplerStateList;
+
+		public MaterialPassDesc Desc;
+
+		public Device Device;
+		public DeviceContext DeviceContext;
+
+		public bool IsValid { get; private set; }
+		public string ErrorMessage { get; private set; }
+
+		private string debugName;
+
+		public MaterialPass(Device device, MaterialPassDesc desc, string debugName = null)
+		{
+			this.Device = device;
+			this.DeviceContext = device.ImmediateContext;
+			this.Desc = desc;
+			this.debugName = debugName ?? ("Pass Object " + Debug.NextObjectId);
+
 			IsValid = false;
 			try
 			{
@@ -155,12 +253,14 @@ namespace Lilium
 
 				var vertexShaderByteCode = CompileShader(filename, desc.VertexShaderFunction, "vs_5_0");
 				VertexShader = new VertexShader(Device, vertexShaderByteCode);
+				VertexShader.DebugName = debugName;
 				ScanConstantBuffers(vertexShaderByteCode);
 
 				if (!string.IsNullOrEmpty(desc.PixelShaderFunction))
 				{
 					var pixelShaderByteCode = CompileShader(filename, desc.PixelShaderFunction, "ps_5_0");
 					PixelShader = new PixelShader(Device, pixelShaderByteCode);
+					PixelShader.DebugName = debugName;
 					ScanConstantBuffers(pixelShaderByteCode);
 				}
 
@@ -168,6 +268,7 @@ namespace Lilium
 				{
 					var domainShaderByteCode = CompileShader(filename, desc.DomainShaderFunction, "ds_5_0");
 					DomainShader = new DomainShader(Device, domainShaderByteCode);
+					DomainShader.DebugName = debugName;
 					ScanConstantBuffers(domainShaderByteCode);
 				}
 
@@ -175,6 +276,7 @@ namespace Lilium
 				{
 					var hullShaderByteCode = CompileShader(filename, desc.HullShaderFunction, "hs_5_0");
 					HullShader = new HullShader(Device, hullShaderByteCode);
+					HullShader.DebugName = debugName;
 					ScanConstantBuffers(hullShaderByteCode);
 				}
 
@@ -208,8 +310,6 @@ namespace Lilium
 				ErrorMessage = e.Message;
 				Debug.Log(ErrorMessage);
 			}
-			SetDebugName(debugName);
-			CreateControls();
 		}
 
 		public void Apply()
@@ -229,6 +329,10 @@ namespace Lilium
 			DeviceContext.PixelShader.SetSamplers(0, SamplerStateList);
 			DeviceContext.PixelShader.SetShaderResources(0, TextureList);
 
+		}
+
+		public void UpdateConstantBuffers()
+		{
 			for (int i = 0; i < autoConstantBuffers.Count; ++i)
 			{
 				autoConstantBuffers[i].Update();
@@ -252,15 +356,6 @@ namespace Lilium
 				DeviceContext.PixelShader.SetSampler(i, null);
 				DeviceContext.PixelShader.SetShaderResource(i, null);
 			}
-		}
-
-		void SetDebugName(string name)
-		{
-			if (VertexShader != null) VertexShader.DebugName = name;
-			if (PixelShader != null) PixelShader.DebugName = name;
-			if (GeometryShader != null) GeometryShader.DebugName = name;
-			if (DomainShader != null) DomainShader.DebugName = name;
-			if (HullShader != null) HullShader.DebugName = name;
 		}
 
 		public void Dispose()
@@ -300,51 +395,6 @@ namespace Lilium
 			if (Layout != null)
 				Layout.Dispose();
 		}
-
-		public override string ToString()
-		{
-			return debugName;
-		}
-
-		#region Selectable
-
-		private Controls.Control[] controls;
-		
-		void CreateControls()
-		{
-			List<Lilium.Controls.Control> list = new List<Lilium.Controls.Control>();
-			var label = new Lilium.Controls.Label("Error", () =>IsValid ? "No Error" : ErrorMessage);
-			list.Add(label);
-			var btn1 = new Lilium.Controls.Button("Edit", () =>
-			{
-				var editor = new MaterialEditor(this);
-				editor.Show();
-			});
-			list.Add(btn1);
-			var btn2 = new Lilium.Controls.Button("Reload", Reload);
-			list.Add(btn2);
-			var btn3 = new Lilium.Controls.Button("Save", () =>
-			{
-				Game.Instance.ResourceManager.Material.Save(this);
-			});
-			list.Add(btn3);
-			foreach (var acb in autoConstantBuffers)
-			{
-				foreach (var av in acb.Variables)
-				{
-					if (av.Name.StartsWith("__")) continue;
-					var control = av.CreateControl();
-					if(control != null) list.Add(control);
-				}
-			}
-			controls = list.ToArray();
-		}
-
-		public Controls.Control[] Controls
-		{
-			get { return controls; }
-		}
-		#endregion
 
 		#region CompileShader
 		class ShaderInclude : Include
@@ -595,6 +645,7 @@ namespace Lilium
 
 		void ScanConstantBuffers(ShaderBytecode code)
 		{
+			if (Desc.ManualConstantBuffers) return;
 			var r = new ShaderReflection(code);
 			int count = r.Description.ConstantBuffers;
 			for (int i = 0; i < count; ++i)
@@ -672,6 +723,19 @@ namespace Lilium
 				acb.Variables.Sort((a, b) => a.StartOffset - b.StartOffset);
 				acb.Init(Device);
 				autoConstantBuffers.Add(acb);
+			}
+		}
+
+		public void CreateAutoVariableControls(List<Lilium.Controls.Control> list)
+		{
+			foreach (var acb in autoConstantBuffers)
+			{
+				foreach (var av in acb.Variables)
+				{
+					if (av.Name.StartsWith("__")) continue;
+					var control = av.CreateControl();
+					if (control != null) list.Add(control);
+				}
 			}
 		}
 		#endregion

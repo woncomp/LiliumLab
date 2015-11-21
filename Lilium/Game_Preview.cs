@@ -141,7 +141,7 @@ namespace Lilium
 		ShaderResourceView shaderResourceView;
 
 		float[] vertices = new float[VERTEX_FLOAT_COUNT * VERTEX_COUNT];
-		Material material;
+		MaterialPass pass;
 		Buffer vertexBuffer;
 		VertexBufferBinding vertexBufferBinding;
 
@@ -162,7 +162,7 @@ namespace Lilium
 			dc.ClearRenderTargetView(game.DefaultRenderTargetView, Color.Maroon);
 			dc.ClearDepthStencilView(game.DefaultDepthStencilView, DepthStencilClearFlags.Depth, 1, 0);
 
-			material.Apply();
+			pass.Apply();
 
 			dc.InputAssembler.PrimitiveTopology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
 			dc.InputAssembler.SetVertexBuffers(0, vertexBufferBinding);
@@ -181,14 +181,14 @@ namespace Lilium
 			CreateTextureShaderResourceView(tex);
 			if (shaderResourceView == null) return;
 
-			MaterialDesc materialDesc = new MaterialDesc();
-			materialDesc.ShaderFile = "../../../Models/sys/TexturePreview.hlsl";
-			materialDesc.DebugName = "Preview";
-			materialDesc.InputElements = new InputElement[]{
+			var passDesc = new MaterialPassDesc();
+			passDesc.ManualConstantBuffers = true;
+			passDesc.ShaderFile = "../../../Models/sys/TexturePreview.hlsl";
+			passDesc.InputElements = new InputElement[]{
 				new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32_Float, 0, 0),
 				new InputElement("TEXCOORD", 0, SharpDX.DXGI.Format.R32G32_Float, 12, 0),
 			};
-			material = new Material(materialDesc);
+			pass = new MaterialPass(Game.Instance.Device, passDesc, "Preview");
 
 			BuildVertexBuffer(tex.Description);
 		}
@@ -277,7 +277,7 @@ namespace Lilium
 
 		public override void Deactive()
 		{
-			Utilities.Dispose(ref material);
+			Utilities.Dispose(ref pass);
 			Utilities.Dispose(ref vertexBuffer);
 			Utilities.Dispose(ref shaderResourceView);
 			shaderResourceView = null;
@@ -310,8 +310,8 @@ namespace Lilium
 
 		Mesh mesh;
 
-		Material materialFill;
-		Material materialWireframe;
+		MaterialPass passFill;
+		MaterialPass passWireframe;
 		Buffer shaderBuffer;
 
 		public MeshPreview(FieldInfo field, PreviewAttribute attr)
@@ -331,10 +331,10 @@ namespace Lilium
 			dc.ClearDepthStencilView(game.DefaultDepthStencilView, DepthStencilClearFlags.Depth, 1, 0);
 
 			mesh.DrawTangentSpaceBasis();
-			
-			var material = Config.DrawWireframe ? materialWireframe : materialFill;
 
-			material.Apply();
+			var pass = Config.DrawWireframe ? passWireframe : passFill;
+
+			pass.Apply();
 
 			ShaderData data = new ShaderData();
 			data.matWorld = Matrix.Identity;
@@ -355,7 +355,7 @@ namespace Lilium
 				mesh.DrawSubmesh(i);
 			}
 
-			material.Clear();
+			pass.Clear();
 		}
 
 		public override void Active()
@@ -365,19 +365,19 @@ namespace Lilium
 			GetMesh(field, ref mesh);
 
 			{
-				var desc = new MaterialDesc();
-				desc.DebugName = "Preview(Fill)";
+				var desc = new MaterialPassDesc();
+				desc.ManualConstantBuffers = true;
 				desc.ShaderFile = "../../../Models/sys/MeshPreview.hlsl";
-				
-				materialFill = new Material(desc);
+
+				passFill = new MaterialPass(game.Device, desc, "Preview(Fill)");
 			}
 			{
-				var desc = new MaterialDesc();
-				desc.DebugName = "Preview(Wireframe)";
+				var desc = new MaterialPassDesc();
+				desc.ManualConstantBuffers = true;
 				desc.ShaderFile = "../../../Models/sys/MeshPreview.hlsl";
 				desc.RasteriazerStates.FillMode = FillMode.Wireframe;
 
-				materialWireframe = new Material(desc);
+				passWireframe = new MaterialPass(game.Device, desc, "Preview(Wireframe)");
 			}
 			shaderBuffer = Material.CreateBuffer<ShaderData>();
 			shaderBuffer.DebugName = "Preview";
@@ -385,8 +385,8 @@ namespace Lilium
 
 		public override void Deactive()
 		{
-			Utilities.Dispose(ref materialFill);
-			Utilities.Dispose(ref materialWireframe);
+			Utilities.Dispose(ref passFill);
+			Utilities.Dispose(ref passWireframe);
 			Utilities.Dispose(ref shaderBuffer);
 		}
 	}

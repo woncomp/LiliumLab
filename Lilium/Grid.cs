@@ -35,7 +35,7 @@ namespace Lilium
 
 		private Buffer vertexBuffer;
 		private Buffer matrixBuffer;
-		private Material material;
+		private MaterialPass pass;
 
 		private LineVertex[] vertices = new LineVertex[MAX_LINE_COUNT * 2];
 		private int vertexCount = 0;
@@ -61,17 +61,17 @@ namespace Lilium
 				vertexBuffer = Buffer.Create(Device, vertices, desc);//new Buffer(Device, desc);
 			}
 			{
-				var materialDesc = new MaterialDesc();
-				materialDesc.ShaderFile = InternalResources.SHADER_DEBUG_LINE;
-				materialDesc.InputElements = new InputElement[]{
+				var passDesc = new MaterialPassDesc();
+				passDesc.ManualConstantBuffers = true;
+				passDesc.ShaderFile = InternalResources.SHADER_DEBUG_LINE;
+				passDesc.InputElements = new InputElement[]{
 					new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32_Float, 0, 0),
 					new InputElement("COLOR", 0, SharpDX.DXGI.Format.R32G32B32A32_Float, 12, 0),
 				};
-				materialDesc.RasteriazerStates.CullMode = CullMode.None;
-				//materialDesc.DepthStencilStates.IsDepthEnabled = false;
-				materialDesc.DepthStencilStates.DepthWriteMask = DepthWriteMask.Zero;
+				passDesc.RasteriazerStates.CullMode = CullMode.None;
+				passDesc.DepthStencilStates.DepthWriteMask = DepthWriteMask.Zero;
 
-				material = new Material(materialDesc);
+				pass = new MaterialPass(Game.Instance.Device, passDesc, "Grid");
 				matrixBuffer = Material.CreateBuffer<Matrix>();
 			}
 		}
@@ -108,7 +108,7 @@ namespace Lilium
 		{
 			var dc = Device.ImmediateContext;
 
-			material.Apply();
+			pass.Apply();
 
 			var matViewProj = Camera.ActiveCamera.ViewMatrix * Camera.ActiveCamera.ProjectionMatrix;
 			dc.UpdateSubresource(ref matViewProj, matrixBuffer);
@@ -120,12 +120,12 @@ namespace Lilium
 
 			dc.Draw(vertexCount, 0);
 
-			material.Clear();
+			pass.Clear();
 		}
 
 		public void Dispose()
 		{
-			material.Dispose();
+			pass.Dispose();
 			matrixBuffer.Dispose();
 			vertexBuffer.Dispose();
 		}

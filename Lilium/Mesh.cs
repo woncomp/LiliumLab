@@ -178,12 +178,14 @@ namespace Lilium
 			}
 			{
 				var materialDesc = new MaterialDesc();
-				materialDesc.ShaderFile = InternalResources.SHADER_DEBUG_LINE;
-				materialDesc.InputElements = new InputElement[]{
+				var passDesc = materialDesc.Passes[0];
+				passDesc.ManualConstantBuffers = true;
+				passDesc.ShaderFile = InternalResources.SHADER_DEBUG_LINE;
+				passDesc.InputElements = new InputElement[]{
 					new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32_Float, 0, 0),
 					new InputElement("COLOR", 0, SharpDX.DXGI.Format.R32G32B32A32_Float, 12, 0),
 				};
-				material = new Material(materialDesc);
+				material = new Material(Game.Instance, materialDesc, "TangentSpaceBasisRenderer");
 				matrixBuffer = Material.CreateBuffer<Matrix>();
 			}
 		}
@@ -192,7 +194,7 @@ namespace Lilium
 		{
 			var dc = Game.Instance.DeviceContext;
 
-			material.Apply();
+			material.Passes[0].Apply();
 
 			var matViewProj = Camera.MainCamera.ViewMatrix * Camera.MainCamera.ProjectionMatrix;
 			dc.UpdateSubresource(ref matViewProj, matrixBuffer);

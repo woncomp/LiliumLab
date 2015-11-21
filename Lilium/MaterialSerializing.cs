@@ -17,6 +17,52 @@ namespace Lilium.Serializing
 {
 	class Material
 	{
+		public static void Serialize(MaterialDesc desc, string filePath)
+		{
+			var materialSerializing = new Material();
+			materialSerializing.Import(desc);
+			var str = JsonConvert.SerializeObject(materialSerializing, Formatting.Indented);
+			System.IO.File.WriteAllText(filePath, str);
+		}
+
+		public static void Deserialize(MaterialDesc desc, string filePath)
+		{
+			var str = System.IO.File.ReadAllText(filePath);
+			var materialSerializing = JsonConvert.DeserializeObject<Material>(str);
+			materialSerializing.Export(desc);
+		}
+
+		public MaterialPass[] Passes;
+		
+		public Material()
+		{
+			Passes = new MaterialPass[0];
+		}
+
+		public void Import(MaterialDesc desc)
+		{
+			Passes = new MaterialPass[desc.Passes.Count];
+			for (int i = 0; i < Passes.Length; ++i)
+			{
+				Passes[i] = new MaterialPass();
+				Passes[i].Import(desc.Passes[i]);
+			}
+		}
+
+		public void Export(MaterialDesc desc)
+		{
+			desc.Passes = new List<MaterialPassDesc>();
+			for (int i = 0; i < Passes.Length; ++i)
+			{
+				var pass = new MaterialPassDesc();
+				Passes[i].Export(pass);
+				desc.Passes.Add(pass);
+			}
+		}
+	}
+
+	class MaterialPass
+	{
 		public string ShaderFile;
 
 		public ShaderEntry ShaderEntry { get; set; }
@@ -27,22 +73,7 @@ namespace Lilium.Serializing
 		public InputElement[] InputElements { get; set; }
 		public MaterialTexture[] Textures { get; set; }
 
-		public static void Serialize(MaterialDesc desc)
-		{
-			var materialSerializing = new Material();
-			materialSerializing.Import(desc);
-			var str = JsonConvert.SerializeObject(materialSerializing, Formatting.Indented);
-			System.IO.File.WriteAllText(desc.FilePath, str);
-		}
-
-		public static void Deserialize(MaterialDesc desc)
-		{
-			var str = System.IO.File.ReadAllText(desc.FilePath);
-			var materialSerializing = JsonConvert.DeserializeObject<Material>(str);
-			materialSerializing.Export(desc);
-		}
-
-		public Material()
+		public MaterialPass()
 		{
 			ShaderEntry = new ShaderEntry();
 			RasterizerStates = new RasterizerState();
@@ -50,7 +81,7 @@ namespace Lilium.Serializing
 			DepthStencilStates = new DepthStencilState();
 		}
 
-		public void Import(MaterialDesc desc)
+		public void Import(MaterialPassDesc desc)
 		{
 			ShaderFile = desc.ShaderFile;
 			ShaderEntry.Import(ref desc);
@@ -63,7 +94,7 @@ namespace Lilium.Serializing
 			Textures = MaterialTexture.Import(desc.Textures);
 		}
 
-		public void Export(MaterialDesc desc)
+		public void Export(MaterialPassDesc desc)
 		{
 			desc.ShaderFile = ShaderFile;
 			ShaderEntry.Export(ref desc);
@@ -87,7 +118,7 @@ namespace Lilium.Serializing
 		public string HullShaderFunction { get; set; }
 		public string DomainShaderFunction { get; set; }
 
-		public void Import(ref MaterialDesc desc)
+		public void Import(ref MaterialPassDesc desc)
 		{
 			VertexShaderFunction = desc.VertexShaderFunction;
 			PixelShaderFunction = desc.PixelShaderFunction;
@@ -96,7 +127,7 @@ namespace Lilium.Serializing
 			DomainShaderFunction = desc.DomainShaderFunction;
 		}
 
-		public void Export(ref MaterialDesc desc)
+		public void Export(ref MaterialPassDesc desc)
 		{
 			desc.VertexShaderFunction = VertexShaderFunction;
 			desc.PixelShaderFunction = PixelShaderFunction;

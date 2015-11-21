@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <UseVSHostingProcess>true</UseVSHostingProcess>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>x64</PlatformTarget>
@@ -36,8 +37,6 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="Test\Material\Test.lm" />
-    <None Include="Test\Material\Wood.lm" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -57,10 +56,6 @@
       <HintPath>..\Library\SharpDX.DXGI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="Test\MainScene.txt" />
-    <Content Include="Test\Shader\Test.hlsl" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lilium\Lilium.csproj">

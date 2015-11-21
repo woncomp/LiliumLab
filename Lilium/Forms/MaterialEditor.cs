@@ -25,7 +25,7 @@ namespace Lilium
 			this.serializing.Import(this.material.Desc);
 
 			this.propertyGrid1.SelectedObject = this.serializing;
-			this.tbShaderFile.Text = this.serializing.ShaderFile;
+			//this.tbShaderFile.Text = this.serializing.ShaderFile;
 		}
 
 		private void propertyGrid1_PropertyValueChanged(object s, PropertyValueChangedEventArgs e)
@@ -38,7 +38,7 @@ namespace Lilium
 			var shaderName = ResourceBrowser.ChooseShader();
 			if(shaderName != null)
 			{
-				this.tbShaderFile.Text = this.serializing.ShaderFile = shaderName;
+				//this.tbShaderFile.Text = this.serializing.ShaderFile = shaderName;
 				this.serializing.Export(this.material.Desc);
 			}
 		}

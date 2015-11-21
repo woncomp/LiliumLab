@@ -3,8 +3,8 @@
     {
       "Mesh": "table.obj",
       "Materials": [
-        "Wood.lm",
-        "Test.lm"
+        "Test.lm",
+        "Wood.lm"
       ],
       "Position": {
         "X": 0.0,

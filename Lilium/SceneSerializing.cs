@@ -42,7 +42,7 @@ namespace Lilium.Serializing
 				dest.Materials = src.SubmeshMaterials.Select(m =>
 					{
 						if (m == null) return null;
-						else return m.ResourceName;
+						else return m.Desc.ResourceName;
 					}).ToArray();
 				dest.Position = src.Position;
 				dest.Rotation = src.Rotation;

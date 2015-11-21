@@ -26,7 +26,10 @@ namespace Lilium.Controls
 		
 		public override void UpdateData()
 		{
-			labelValue.Text = _get().ToString();
+			if (_get != null)
+			{
+				labelValue.Text = _get();
+			}
 		}
 	}
 }

@@ -168,18 +168,22 @@ namespace Lilium
 
 		public void Save(Material material)
 		{
-			var desc = material.Desc;
-			var oldFilePath = desc.FilePath;
-			desc.FilePath = Path.Combine(mgr.FirstSearchFolder, SubfolderName, Path.GetFileName(oldFilePath));
-			desc.Save();
-			desc.FilePath = oldFilePath;
+			Save(material.Desc);
+		}
+
+		public void Save(MaterialDesc desc)
+		{
+			var resName = desc.ResourceName;
+			if (!resName.EndsWith(".lm")) resName += ".lm";
+			var filePath = Path.Combine(mgr.FirstSearchFolder, SubfolderName, resName);
+			desc.Save(filePath);
 		}
 
 		protected override Material LoadFunc(Device device, string filePath)
 		{
 			var desc = MaterialDesc.Load(filePath);
-			var material = new Material(desc);
-			material.ResourceName = LoadingResourceName;
+			desc.ResourceName = LoadingResourceName;
+			var material = new Material(Game.Instance, desc, Path.GetFileNameWithoutExtension(LoadingResourceName));
 			return material;
 		}
 	}

@@ -44,7 +44,7 @@ namespace Lilium
 			CreateControls();
 		}
 
-		public void SetMaterial(int index, MaterialDesc material)
+		public void SetMaterial(int index, MaterialDesc materialDesc)
 		{
 			if(SubmeshMaterials.Length <= index)
 			{
@@ -52,7 +52,7 @@ namespace Lilium
 				Array.Copy(SubmeshMaterials, array, SubmeshMaterials.Length);
 				SubmeshMaterials = array;
 			}
-			SubmeshMaterials[index] = new Material(material);
+			SubmeshMaterials[index] = new Material(Game.Instance, materialDesc, materialDesc.ResourceName);
 			Game.Instance.AutoDispose(SubmeshMaterials[index]);
 		}
 
@@ -111,8 +111,12 @@ namespace Lilium
 				var material = SubmeshMaterials[i];
 				if(material == null || !material.IsValid) continue;
 
-				material.Apply();
-				Mesh.DrawSubmesh(i);
+				for (int j = 0; j < material.Passes.Length; ++j)
+				{
+					material.Passes[j].Apply();
+					material.Passes[j].UpdateConstantBuffers();
+					Mesh.DrawSubmesh(i);
+				}
 			}
 
 			if (Config.DrawGizmo && Game.Instance.SelectedObject == this)
