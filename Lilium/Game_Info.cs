@@ -78,6 +78,13 @@ namespace Lilium
 			selectedObject = obj;
 			if (selectedObject != null)
 			{
+				{
+					var str = string.Format("{0}({1})", selectedObject.TextOnList, selectedObject.GetType().Name);
+					var str2 = string.Format("{0,-30}=== >", str);
+					var label = new Label("<< ===", () => str2);
+					AddControl(label);
+					selectedObjectControls.Add(label);
+				}
 				var controls = selectedObject.Controls;
 				if (controls != null)
 				{
@@ -118,5 +125,6 @@ namespace Lilium
 	public interface ISelectable
 	{
 		Control[] Controls { get; }
+		string TextOnList { get; }
 	}
 }

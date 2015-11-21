@@ -51,11 +51,6 @@ namespace Lilium
 			}
 		}
 
-		public override string ToString()
-		{
-			return Name;
-		}
-
 		#region Selectable
 
 		private Controls.Control[] controls;
@@ -86,10 +81,9 @@ namespace Lilium
 			controls = new Controls.Control[] { btn1, btn2, btn3 };
 		}
 
-		public Controls.Control[] Controls
-		{
-			get { return controls; }
-		}
+		public Controls.Control[] Controls { get { return controls; } }
+		public string TextOnList { get { return Name; } }
+
 		#endregion
 	}
 }

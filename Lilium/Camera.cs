@@ -84,11 +84,6 @@ namespace Lilium
 			if (CameraDistance < 1) CameraDistance = 1;
 		}
 
-		public override string ToString()
-		{
-			return Name;
-		}
-
 		#region Selectable
 		private Controls.Control[] controls;
 
@@ -109,10 +104,9 @@ namespace Lilium
 			controls = new Controls.Control[] { cameraInfo, button, sliderx, slidery, sliderz, clearColor };
 		}
 
-		public Controls.Control[] Controls
-		{
-			get { return controls; }
-		}
+		public Controls.Control[] Controls { get { return controls; } }
+		public string TextOnList { get { return Name; } }
+
 		#endregion
 	}
 }

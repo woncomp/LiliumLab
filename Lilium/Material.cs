@@ -192,11 +192,6 @@ namespace Lilium
 			}
 		}
 
-		public override string ToString()
-		{
-			return debugName;
-		}
-
 		public void Dispose()
 		{
 			for (int i = 0; i < Passes.Length; ++i)
@@ -242,10 +237,9 @@ namespace Lilium
 			controls = list.ToArray();
 		}
 
-		public Controls.Control[] Controls
-		{
-			get { return controls; }
-		}
+		public Controls.Control[] Controls { get { return controls; } }
+		public string TextOnList { get { return DebugName; } }
+
 		#endregion
 	}
 

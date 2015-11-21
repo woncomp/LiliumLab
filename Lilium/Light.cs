@@ -26,22 +26,10 @@ namespace Lilium
 		public float LightYaw = 160;
 		public float LightPitch = -45;
 
-		private Controls.Control[] controls;
-
 		public Light()
 		{
 			Name = "Light " + Debug.NextObjectId;
 			CreateControls();
-		}
-
-		void CreateControls()
-		{
-			var lightInfo = new Lilium.Controls.Label("Light Dir", () => LightDirection.ToString("0.000"));
-			var lightSlider = new Lilium.Controls.Slider("Light Distance", 1, 100, () => LightDistance, val => LightDistance = val);
-			var lightToggle = new Lilium.Controls.Toggle("Draw Light", () => DrawLight, val => DrawLight = val);
-			var ambient = new Lilium.Controls.ColorPicker("Ambient Color", () => AmbientColor, val => AmbientColor = val);
-			var diffuse = new Lilium.Controls.ColorPicker("Diffuse Color", () => DiffuseColor, val => DiffuseColor = val);
-			controls = new Controls.Control[] { lightInfo, lightSlider, lightToggle, ambient, diffuse };
 		}
 		
 		public void Update()
@@ -95,14 +83,22 @@ namespace Lilium
 			}
 		}
 
-		public Controls.Control[] Controls
-		{
-			get { return controls; }
-		}
+		#region Selectable
 
-		public override string ToString()
+		private Controls.Control[] controls;
+
+		void CreateControls()
 		{
-			return Name;
+			var lightInfo = new Lilium.Controls.Label("Light Dir", () => LightDirection.ToString("0.000"));
+			var lightSlider = new Lilium.Controls.Slider("Light Distance", 1, 100, () => LightDistance, val => LightDistance = val);
+			var lightToggle = new Lilium.Controls.Toggle("Draw Light", () => DrawLight, val => DrawLight = val);
+			var ambient = new Lilium.Controls.ColorPicker("Ambient Color", () => AmbientColor, val => AmbientColor = val);
+			var diffuse = new Lilium.Controls.ColorPicker("Diffuse Color", () => DiffuseColor, val => DiffuseColor = val);
+			controls = new Controls.Control[] { lightInfo, lightSlider, lightToggle, ambient, diffuse };
 		}
+		public Controls.Control[] Controls { get { return controls; } }
+		public string TextOnList { get { return Name; } }
+
+		#endregion
 	}
 }
