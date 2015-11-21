@@ -21,6 +21,7 @@
 
 cbuffer data
 {
+	float4 SomeColor = float4(1, 0, 0, 1);
 	float TestValue = 0.5;
 	float3 ___;
 };
@@ -62,5 +63,5 @@ float4 PS(PS_IN input) : SV_Target
 	l = saturate(dot(normalW, lightDir));
 	color = ambientColor + l * diffuseColor;
 
-	return baseMapValue * color * TestValue;
+	return baseMapValue * color * TestValue * SomeColor;
 }

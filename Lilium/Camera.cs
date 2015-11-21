@@ -104,7 +104,9 @@ namespace Lilium
 			var slidery = new Lilium.Controls.Slider("Focus Point Y", -10, 10, () => FocusPoint.Y, val => FocusPoint.Y = val);
 			var sliderz = new Lilium.Controls.Slider("Focus Point Z", -10, 10, () => FocusPoint.Z, val => FocusPoint.Z = val);
 
-			controls = new Controls.Control[] { cameraInfo, button, sliderx, slidery, sliderz };
+			var clearColor = new Lilium.Controls.ColorPicker("Clear Color", () => ClearColor.ToVector4(), val => ClearColor = new Color(val));
+
+			controls = new Controls.Control[] { cameraInfo, button, sliderx, slidery, sliderz, clearColor };
 		}
 
 		public Controls.Control[] Controls

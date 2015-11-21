@@ -147,6 +147,7 @@ namespace Lilium
 			IsValid = false;
 			try
 			{
+				autoConstantBuffers = new List<AutoConstantBuffer>();
 				var filename = Game.Instance.ResourceManager.FindValidShaderFilePath(desc.ShaderFile);
 
 				if (string.IsNullOrEmpty(desc.VertexShaderFunction))
@@ -561,7 +562,7 @@ namespace Lilium
 
 		class AutoColorVariable : AutoVariable
 		{
-			public Color value = Color.White;
+			public Vector4 value = Vector4.One;
 
 			public AutoColorVariable(ShaderReflectionVariable v)
 				: base(v)
@@ -569,14 +570,13 @@ namespace Lilium
 				unsafe
 				{
 					Vector4* p = (Vector4*)v.Description.DefaultValue;
-					if (p != null) value = new Color(*p);
+					if (p != null) value = *p;
 				}
 			}
 			public override void Write(DataStream stream) { stream.Write(value); }
 			public override Controls.Control CreateControl()
 			{
-				Debug.Log("Auto control of matrix variable type not implemented.");
-				return null;
+				return new Lilium.Controls.ColorPicker(Name, () => value, val => value = val);
 			}
 		}
 
@@ -588,13 +588,13 @@ namespace Lilium
 			public override void Write(DataStream stream) { stream.Write(value); }
 			public override Controls.Control CreateControl()
 			{
+				Debug.Log("Auto control of matrix variable type not implemented.");
 				return null;
 			}
 		}
 
 		void ScanConstantBuffers(ShaderBytecode code)
 		{
-			autoConstantBuffers = new List<AutoConstantBuffer>();
 			var r = new ShaderReflection(code);
 			int count = r.Description.ConstantBuffers;
 			for (int i = 0; i < count; ++i)

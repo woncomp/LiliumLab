@@ -40,6 +40,9 @@
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="OpenPainter.ColorPicker">
+      <HintPath>..\Library\OpenPainter.ColorPicker.dll</HintPath>
+    </Reference>
     <Reference Include="SharpDX, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Library\SharpDX.dll</HintPath>
@@ -72,6 +75,12 @@
     </Compile>
     <Compile Include="Controls\Button.Designer.cs">
       <DependentUpon>Button.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\ColorPicker.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\ColorPicker.Designer.cs">
+      <DependentUpon>ColorPicker.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\ComboBox.cs">
       <SubType>UserControl</SubType>
@@ -145,6 +154,9 @@
   <ItemGroup>
     <EmbeddedResource Include="Controls\Button.resx">
       <DependentUpon>Button.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\ColorPicker.resx">
+      <DependentUpon>ColorPicker.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\ComboBox.resx">
       <DependentUpon>ComboBox.cs</DependentUpon>
