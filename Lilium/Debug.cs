@@ -14,7 +14,7 @@ namespace Lilium
 		private static int nextObjectId = 0;
 		public static int NextObjectId { get { return ++nextObjectId; } }
 
-		public static void Log(string str)
+		public static void Log(object str)
 		{
 			System.Diagnostics.Debug.WriteLine(str);
 		}

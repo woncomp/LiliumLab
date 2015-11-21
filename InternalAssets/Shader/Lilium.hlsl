@@ -5,6 +5,7 @@ cbuffer LiliumPerFrame : register(b1)
 	float4x4 matView;
 	float4x4 matProjection;
 	float4 lightDir;
+	float4 eyePos;
 	float4 ambientColor;
 	float4 diffuseColor;
 };

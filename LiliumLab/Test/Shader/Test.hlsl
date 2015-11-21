@@ -19,6 +19,12 @@
 			data.diffuseColor = new Vector4(diffuse, diffuse, diffuse, 1);
 */
 
+cbuffer data
+{
+	float TestValue = 0.5;
+	float3 ___;
+};
+
 struct PS_IN
 {
 	float4 position : SV_POSITION;
@@ -56,5 +62,5 @@ float4 PS(PS_IN input) : SV_Target
 	l = saturate(dot(normalW, lightDir));
 	color = ambientColor + l * diffuseColor;
 
-	return baseMapValue * color;
+	return baseMapValue * color * TestValue;
 }

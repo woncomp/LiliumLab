@@ -18,6 +18,7 @@ namespace Lilium
 		}
 
 		private List<Control> infoControls = new List<Control>();
+		private List<Control> selectedObjectControls = new List<Control>();
 
 		private ISelectable selectedObject;
 
@@ -66,13 +67,13 @@ namespace Lilium
 
 		void Info_SetSelcectedObject(ISelectable obj)
 		{
-			if (selectedObject != null)
+			if (selectedObjectControls.Count > 0)
 			{
-				var controls = selectedObject.Controls;
-				for (int i = controls.Length - 1; i >= 0; --i) 
+				for (int i = selectedObjectControls.Count - 1; i >= 0; --i) 
 				{
-					RemoveControl(controls[i]);
+					RemoveControl(selectedObjectControls[i]);
 				}
+				selectedObjectControls.Clear();
 			}
 			selectedObject = obj;
 			if (selectedObject != null)
@@ -81,6 +82,7 @@ namespace Lilium
 				for (int i = 0; i < controls.Length; ++i)
 				{
 					AddControl(controls[i]);
+					selectedObjectControls.Add(controls[i]);
 				}
 			}
 		}

@@ -125,8 +125,8 @@ namespace Lilium
 
 			Camera.MainCamera.Begin();
 			UpdatePerFrameBuffer();
-			OnUpdate();//MTBTODO
 			MainScene.Draw();
+			OnUpdate();
 
 			grid.Draw();
 			Preview_Render();
@@ -153,6 +153,7 @@ namespace Lilium
 			public Matrix matView;
 			public Matrix matProjection;
 			public Vector4 lightDir;
+			public Vector4 eyePos;
 			public Vector4 ambientColor;
 			public Vector4 diffuseColor;
 		}
@@ -179,9 +180,10 @@ namespace Lilium
 			var light = Light.MainLight;
 
 			var data = new LiliumPerFrameData();
-			data.matView = Camera.MainCamera.ViewMatrix;
-			data.matProjection = Camera.MainCamera.ProjectionMatrix;
+			data.matView = Camera.ActiveCamera.ViewMatrix;
+			data.matProjection = Camera.ActiveCamera.ProjectionMatrix;
 			data.lightDir = light.LightDir4;
+			data.eyePos = new Vector4(Camera.ActiveCamera.Position, 1);
 			data.ambientColor = light.AmbientColor;
 			data.diffuseColor = light.DiffuseColor;
 			DeviceContext.UpdateSubresource(ref data, perFrameBuffer);
