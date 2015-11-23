@@ -49,6 +49,7 @@ namespace Lilium
 		public ResourceManager ResourceManager { get; private set; }
 
 		public Scene MainScene;
+		public StencilShadowRenderer StencilShadowRenderer;
 		public Lilium.Controls.RenderControl RenderControl;
 
 		private Grid grid;
@@ -97,6 +98,9 @@ namespace Lilium
 			MainScene = new Scene();
 			MainScene.Name = "Main Scene";
 			AddObject(MainScene);
+
+			StencilShadowRenderer = new Lilium.StencilShadowRenderer(this);
+			AutoDispose(StencilShadowRenderer);
 
 			Camera.MainCamera = new Camera();
 			Camera.MainCamera.Name = "Main Camera";

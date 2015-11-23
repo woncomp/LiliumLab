@@ -40,16 +40,17 @@ namespace Lilium
 
 	public class MaterialPassDesc
 	{
-		public RasterizerStateDescription RasteriazerStates;
-		public BlendStateDescription BlendStates;
-		public DepthStencilStateDescription DepthStencilStates;
-
 		public string ShaderFile;
 		public string VertexShaderFunction;
 		public string PixelShaderFunction;
 		public string GeometryShaderFunction;
 		public string HullShaderFunction;
 		public string DomainShaderFunction;
+
+		public RasterizerStateDescription RasteriazerStates;
+		public BlendStateDescription BlendStates;
+		public DepthStencilStateDescription DepthStencilStates;
+		public int StencilRef;
 
 		public InputElement[] InputElements;
 
@@ -61,12 +62,14 @@ namespace Lilium
 
 		public MaterialPassDesc()
 		{
+			VertexShaderFunction = "VS";
+			PixelShaderFunction = "PS";
+
 			RasteriazerStates = RasterizerStateDescription.Default();
 			BlendStates = BlendStateDescription.Default();
 			DepthStencilStates = DepthStencilStateDescription.Default();
 
-			VertexShaderFunction = "VS";
-			PixelShaderFunction = "PS";
+			StencilRef = 0;
 
 			InputElements = new InputElement[]{
 				new InputElement("POSITION", 0, Format.R32G32B32_Float, 0, 0),
@@ -379,7 +382,7 @@ namespace Lilium
 
 			DeviceContext.Rasterizer.State = RasterizerState;
 			DeviceContext.OutputMerger.BlendState = BlendState;
-			DeviceContext.OutputMerger.DepthStencilState = DepthStencilState;
+			DeviceContext.OutputMerger.SetDepthStencilState(DepthStencilState, Desc.StencilRef);
 
 			DeviceContext.PixelShader.SetSamplers(0, SamplerStateList);
 			DeviceContext.PixelShader.SetShaderResources(0, TextureList);
@@ -404,7 +407,7 @@ namespace Lilium
 
 			DeviceContext.Rasterizer.State = Game.Instance.DefaultRasterizerState;
 			DeviceContext.OutputMerger.BlendState = Game.Instance.DefaultBlendState;
-			DeviceContext.OutputMerger.DepthStencilState = Game.Instance.DefaultDepthStencilState;
+			DeviceContext.OutputMerger.SetDepthStencilState(null);
 
 			for (int i = 0; i < TextureList.Length; ++i)
 			{

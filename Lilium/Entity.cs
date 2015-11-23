@@ -18,6 +18,8 @@ namespace Lilium
 
 		public string Name;
 
+		public float StencilShadowIndensity = 0;
+
 		public Matrix TransformMatrix
 		{
 			get {
@@ -119,6 +121,8 @@ namespace Lilium
 				}
 			}
 
+			if (StencilShadowIndensity > 0) DrawStencilShadow();
+
 			if (Config.DrawGizmo && Game.Instance.SelectedObject == this)
 			{
 				var pV = Vector3.TransformCoordinate(Vector3.Zero, Camera.MainCamera.ViewMatrix);
@@ -131,7 +135,16 @@ namespace Lilium
 				Debug.Line(Position, Position + Vector3.TransformNormal(Vector3.UnitY, rot) * scale, Color.Green);
 				Debug.Line(Position, Position + Vector3.TransformNormal(Vector3.UnitZ, rot) * scale, Color.Blue);
 			}
+		}
 
+		void DrawStencilShadow()
+		{
+			Game.Instance.StencilShadowRenderer.Begin(this.TransformMatrix, new Plane(0, 1, 0, -0.001f), StencilShadowIndensity);
+			Mesh.DrawBegin();
+			for (int j = 0; j < Mesh.SubmeshCount; ++j)
+			{
+				Mesh.DrawSubmesh(j);
+			}
 		}
 
 		public void Dispose()
@@ -159,34 +172,10 @@ namespace Lilium
 			list.Add(label6);
 			var toggle = new Lilium.Controls.Toggle("Draw Gizmo", () => Config.DrawGizmo, val => Config.DrawGizmo = val);
 			list.Add(toggle);
+			var slider = new Lilium.Controls.Slider("Stencil Shadow", 0, 1, () => StencilShadowIndensity, val => StencilShadowIndensity = val);
+			list.Add(slider);
 			for (int i = 0; i < Mesh.SubmeshCount; ++i)
 			{
-				//int index = i;
-				//var labelm = new Lilium.Controls.Label("<  ---", () =>
-				//	{
-				//		string name = "Empty";
-				//		var m = SubmeshMaterials[index];
-				//		if (m != null) name = m.DebugName;
-				//		name = "Material " + index + " : " + name;
-				//		return string.Format("{0,-30}---  >", name);
-				//	});
-				//list.Add(labelm);
-				//var btn1 = new Lilium.Controls.Button("Browse", () =>
-				//{
-				//	var resName = ResourceBrowser.ChooseMaterial();
-				//	if (!string.IsNullOrEmpty(resName))
-				//	{
-				//		SubmeshMaterials[index] = Game.Instance.ResourceManager.Material.Load(resName);
-				//	}
-				//});
-				//list.Add(btn1);
-				//var btn2 = new Lilium.Controls.Button("Select", () =>
-				//{
-				//	var m = SubmeshMaterials[index];
-				//	if (m != null) Game.Instance.SelectedObject = m;
-				//});
-				//list.Add(btn2);
-
 				list.Add(new Lilium.Controls.EntityMaterialSlot(this, i));
 			}
 			controls = list.ToArray();

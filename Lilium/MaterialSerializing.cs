@@ -68,6 +68,8 @@ namespace Lilium.Serializing
 		public BlendState BlendStates { get; set; }
 		public DepthStencilState DepthStencilStates { get; set; }
 
+		public int StencilRef { get; set; }
+
 		public InputElement[] InputElements { get; set; }
 		public MaterialTexture[] Textures { get; set; }
 
@@ -87,6 +89,7 @@ namespace Lilium.Serializing
 			RasterizerStates.Import(ref desc.RasteriazerStates);
 			BlendStates.Import(ref desc.BlendStates);
 			DepthStencilStates.Import(ref desc.DepthStencilStates);
+			StencilRef = desc.StencilRef;
 
 			// Other
 			InputElements = InputElement.Import(desc.InputElements);
@@ -100,6 +103,7 @@ namespace Lilium.Serializing
 			RasterizerStates.Export(ref desc.RasteriazerStates);
 			BlendStates.Export(ref desc.BlendStates);
 			DepthStencilStates.Export(ref desc.DepthStencilStates);
+			desc.StencilRef = StencilRef;
 
 			// Other
 			desc.InputElements = InputElement.Export(InputElements);

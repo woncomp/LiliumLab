@@ -2,7 +2,7 @@
   "Passes": [
     {
       "VariableValues": {
-        "SomeColor": "0.9921569,0,0,1",
+        "SomeColor": "0.7372549,0.7372549,0.7372549,1",
         "TestValue": "1;min=0;max=1"
       },
       "ShaderEntry": {
@@ -131,6 +131,7 @@
         "StencilReadMask": 255,
         "StencilWriteMask": 255
       },
+      "StencilRef": 0,
       "InputElements": [
         {
           "AlignedByteOffset": 0,
@@ -171,6 +172,7 @@
       ],
       "Textures": [
         {
+          "TextureFile": "wood.png",
           "AddressU": 3,
           "AddressV": 3,
           "AddressW": 3,
@@ -185,8 +187,7 @@
           "MaximumAnisotropy": 16,
           "MaximumLod": 0.0,
           "MinimumLod": 0.0,
-          "MipLodBias": 0.0,
-          "TextureFile": "brick_d.png"
+          "MipLodBias": 0.0
         }
       ]
     }

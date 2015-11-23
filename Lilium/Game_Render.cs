@@ -18,21 +18,18 @@ namespace Lilium
 		public BlendState DefaultBlendState { get { return _blendStateDefault; } }
 		public BlendState AlphaBlendState { get { return _blendStateAlphaBlend; } }
 		public RasterizerState DefaultRasterizerState { get { return _rasterizerStateDefault; } }
-		public DepthStencilState DefaultDepthStencilState { get { return _depthStencilStateDefault; } }
 
 		private SamplerState _samplerStateDefault;
 		private SamplerState _samplerStateWrap;
 		private BlendState _blendStateDefault;
 		private BlendState _blendStateAlphaBlend;
 		private RasterizerState _rasterizerStateDefault;
-		private DepthStencilState _depthStencilStateDefault;
 
 		void Render_Init()
 		{
 			CreateSamplerStates();
 			CreateBlendStates();
 			CreateRasterizerStates();
-			CreateDepthStencilStates();
 		}
 		
 		void CreateSamplerStates()
@@ -77,13 +74,6 @@ namespace Lilium
 			var desc = RasterizerStateDescription.Default();
 			_rasterizerStateDefault = new RasterizerState(Device, desc);
 			AutoDispose(_rasterizerStateDefault);
-		}
-
-		void CreateDepthStencilStates()
-		{
-			var desc = DepthStencilStateDescription.Default();
-			_depthStencilStateDefault = new DepthStencilState(Device, desc);
-			AutoDispose(_depthStencilStateDefault);
 		}
 
 		public void Clear(Color color)
