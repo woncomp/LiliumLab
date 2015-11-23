@@ -19,5 +19,7 @@ namespace Lilium
 
 		public static bool LoadMeshComputeTangent = true;
 		public static bool LoadMeshPrintLog = true;
+
+		public static bool PreviewSuppressDebugLines = false;
 	}
 }

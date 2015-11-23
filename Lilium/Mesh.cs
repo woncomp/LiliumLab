@@ -20,7 +20,7 @@ namespace Lilium
 		public Vector2 TexCoord;
 	}
 
-	public class Mesh : MeshConstructor, IDisposable
+	public class Mesh : MeshConstructor, IDisposable, ISelectable, IPreviewable
 	{
 		internal List<Submesh> submeshes = new List<Submesh>();
 
@@ -31,7 +31,7 @@ namespace Lilium
 
 		internal VertexBufferBinding vertexBufferBinding;
 
-		internal TangentSpaceBasisRenderer tangentRenderer;
+		internal List<MeshVertex> vertices;
 
 		public string ResourceName;
 				
@@ -52,6 +52,7 @@ namespace Lilium
 		public Mesh(SharpDX.Direct3D11.Device device)
 		{
 			this.device = device;
+			CreateControls();
 		}
 
 		public void DrawBegin()
@@ -70,14 +71,6 @@ namespace Lilium
 			dc.DrawIndexed(submesh.Count, submesh.Start, 0);
 		}
 
-		public void DrawTangentSpaceBasis()
-		{
-			if (Config.DrawTBN)
-			{
-				tangentRenderer.OnRender();
-			}
-		}
-
 		public Submesh GetSubmesh(int index)
 		{
 			return this.submeshes[index];
@@ -85,139 +78,73 @@ namespace Lilium
 
 		public void Dispose()
 		{
-			tangentRenderer.Dispose();
+			PreviewDeactive();
 			if(vertexBuffer != null)
 			{
 				vertexBuffer.Dispose();
 				indexBuffer.Dispose();
 			}
 		}
+
+		#region Preview
+
+		private MeshPreview preview;
+
+		public void PreviewDraw()
+		{
+			if(preview != null)
+				preview.Draw();
+		}
+
+		public void PreviewActive()
+		{
+			preview = new MeshPreview(this);
+		}
+
+		public void PreviewDeactive()
+		{
+			Utilities.Dispose(ref preview);
+		}
+		#endregion
+
+		#region Selectable
+
+		private Lilium.Controls.Control[] controls;
+
+		void CreateControls()
+		{
+			List<Lilium.Controls.Control> list = new List<Controls.Control>();
+			if (true)
+			{
+				var toggle = new Lilium.Controls.Toggle("Draw TBN", () => Config.DrawTBN, val => Config.DrawTBN = val);
+				list.Add(toggle);
+				var slider = new Lilium.Controls.Slider("Draw TBN Offset", 0, 2, () => Config.TBNOffset, val => Config.TBNOffset = val);
+				list.Add(slider);
+			}
+			if (true)
+			{
+				var toggle = new Lilium.Controls.Toggle("Draw Wireframe", () => Config.DrawWireframe, val => Config.DrawWireframe = val);
+				list.Add(toggle);
+			}
+			controls = list.ToArray();
+		}
+
+		public Controls.Control[] Controls
+		{
+			get { return controls; }
+		}
+
+		public string NameInObjectList
+		{
+			get { return System.IO.Path.GetFileNameWithoutExtension(ResourceName); }
+		}
+		#endregion
 	}
 
 	public class Submesh
 	{
 		public int Start;
 		public int Count;
-	}
-
-	public class TangentSpaceBasisRenderer : IDisposable
-	{
-		struct LineVertex
-		{
-			public Vector3 Position;
-			public Vector4 Color;
-
-			public LineVertex(Vector3 pos, Color color)
-			{
-				Position = pos;
-				Color = color.ToVector4();
-			}
-		}
-
-		private Buffer vertexBuffer;
-		private Buffer matrixBuffer;
-		private Material material;
-
-		private bool hasTangent;
-
-		private LineVertex[] lineVertices;
-		private Action updateLineVertices;
-
-		public TangentSpaceBasisRenderer(List<MeshVertex> vertices)
-		{
-			hasTangent = vertices[0].Tangent.LengthSquared() > 0;
-			{
-				var lineVerticesList = new List<LineVertex>();
-				Action<Color> _addLine = (c) =>
-				{
-					lineVerticesList.Add(new LineVertex(Vector3.Zero, c));
-					lineVerticesList.Add(new LineVertex(Vector3.Zero, c));
-				};
-				for (int i = 0; i < vertices.Count; ++i)
-				{
-					var v = vertices[i];
-					if (hasTangent)
-					{
-						_addLine(Color.Red);
-						_addLine(Color.Green);
-					}
-					_addLine(Color.Blue);
-				}
-				lineVertices = lineVerticesList.ToArray();
-
-				updateLineVertices = delegate
-				{
-					int i = 0;
-					int j = 0;
-					for (i = 0; i < vertices.Count; ++i)
-					{
-						var v = vertices[i];
-						var origin = v.Position + Config.TBNOffset * v.Normal;
-
-						if(hasTangent)
-						{
-							lineVertices[j++].Position = origin;
-							lineVertices[j++].Position = origin + v.Tangent;
-							lineVertices[j++].Position = origin;
-							lineVertices[j++].Position = origin + Vector3.Cross(v.Normal, v.Tangent);
-						}
-						lineVertices[j++].Position = origin;
-						lineVertices[j++].Position = origin + v.Normal;
-					}
-				};
-			}
-			{
-				var desc = new BufferDescription();
-				desc.BindFlags = BindFlags.VertexBuffer;
-				desc.Usage = ResourceUsage.Dynamic;
-				desc.CpuAccessFlags = CpuAccessFlags.Write;
-				desc.OptionFlags = ResourceOptionFlags.None;
-				desc.SizeInBytes = Utilities.SizeOf<LineVertex>() * lineVertices.Length;
-				desc.StructureByteStride = 0;
-				vertexBuffer = new Buffer(Game.Instance.Device, desc);
-			}
-			{
-				var materialDesc = new MaterialDesc();
-				var passDesc = materialDesc.Passes[0];
-				passDesc.ManualConstantBuffers = true;
-				passDesc.ShaderFile = InternalResources.SHADER_DEBUG_LINE;
-				passDesc.InputElements = new InputElement[]{
-					new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32_Float, 0, 0),
-					new InputElement("COLOR", 0, SharpDX.DXGI.Format.R32G32B32A32_Float, 12, 0),
-				};
-				material = new Material(Game.Instance, materialDesc, "TangentSpaceBasisRenderer");
-				matrixBuffer = Material.CreateBuffer<Matrix>();
-			}
-		}
-
-		public void OnRender()
-		{
-			var dc = Game.Instance.DeviceContext;
-
-			material.Passes[0].Apply();
-
-			var matViewProj = Camera.MainCamera.ViewMatrix * Camera.MainCamera.ProjectionMatrix;
-			dc.UpdateSubresource(ref matViewProj, matrixBuffer);
-			dc.VertexShader.SetConstantBuffer(0, matrixBuffer);
-
-			updateLineVertices();
-			var box = dc.MapSubresource(vertexBuffer, 0, MapMode.WriteDiscard, MapFlags.None);
-			Utilities.Write(box.DataPointer, lineVertices, 0, lineVertices.Length);
-			dc.UnmapSubresource(vertexBuffer, 0);
-			
-			dc.InputAssembler.PrimitiveTopology = SharpDX.Direct3D.PrimitiveTopology.LineList;
-			var bd = new VertexBufferBinding(vertexBuffer, Utilities.SizeOf<LineVertex>(), 0);
-			dc.InputAssembler.SetVertexBuffers(0, bd);
-
-			dc.Draw(lineVertices.Length, 0);
-		}
-
-		public void Dispose()
-		{
-			vertexBuffer.Dispose();
-			matrixBuffer.Dispose();
-			material.Dispose();
-		}
 	}
 
 	public class MeshConstructor
@@ -542,13 +469,13 @@ namespace Lilium
 
 			if(computeTangent) ComputeTangent(vertices, indices);
 
-			mesh.tangentRenderer = new TangentSpaceBasisRenderer(vertices);
-
 			mesh.vertexBuffer = Buffer.Create(device, BindFlags.VertexBuffer, vertices.ToArray());
 			mesh.vertexBufferBinding = new VertexBufferBinding(mesh.vertexBuffer, Utilities.SizeOf<MeshVertex>(), 0);
 
 			//mesh.indexBuffer = new Buffer(device, Utilities.SizeOf<int>() * indexCount,
 			mesh.indexBuffer = Buffer.Create(device, BindFlags.IndexBuffer, indices.ToArray());
+
+			mesh.vertices = vertices;
 
 			return mesh;
 		}

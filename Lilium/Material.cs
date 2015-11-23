@@ -127,6 +127,8 @@ namespace Lilium
 			this.debugName = debugName ?? "Material Object " + Debug.NextObjectId;
 
 			Load();
+
+			game.AddObject(this);
 		}
 
 		public void Reload()
@@ -224,7 +226,8 @@ namespace Lilium
 				list.Add(btn3);
 				for (int i = 0; i < Passes.Length; ++i)
 				{
-					list.Add(new Lilium.Controls.Label("Pass " + i, () => "--------------"));
+					var passText = string.Format("{0,-30}---  >", "Pass " + i);
+					list.Add(new Lilium.Controls.Label("<  --- ", () => passText));
 					Passes[i].CreateAutoVariableControls(list);
 				}
 			}
@@ -238,7 +241,7 @@ namespace Lilium
 		}
 
 		public Controls.Control[] Controls { get { return controls; } }
-		public string TextOnList { get { return DebugName; } }
+		public string NameInObjectList { get { return DebugName; } }
 
 		#endregion
 	}

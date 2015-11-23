@@ -31,7 +31,7 @@ namespace Lilium
 		public Entity(Mesh mesh)
 		{
 			this.Mesh = mesh;
-			this.Name = "Mesh" + Debug.NextObjectId;
+			this.Name = "Entity" + Debug.NextObjectId;
 			SubmeshMaterials = new Material[mesh.SubmeshCount];
 			CreateControls();
 		}
@@ -39,7 +39,7 @@ namespace Lilium
 		public Entity(string meshName)
 		{
 			this.Mesh = Game.Instance.ResourceManager.Mesh.Load(meshName);
-			this.Name = "Mesh" + Debug.NextObjectId + " " + System.IO.Path.GetFileNameWithoutExtension(meshName);
+			this.Name = "Entity" + Debug.NextObjectId + " " + System.IO.Path.GetFileNameWithoutExtension(meshName);
 			SubmeshMaterials = new Material[Mesh.SubmeshCount];
 			CreateControls();
 		}
@@ -162,11 +162,13 @@ namespace Lilium
 			for (int i = 0; i < Mesh.SubmeshCount; ++i)
 			{
 				int index = i;
-				var labelm = new Lilium.Controls.Label("Material " + index, () =>
+				var labelm = new Lilium.Controls.Label("<  ---", () =>
 					{
+						string name = "Empty";
 						var m = SubmeshMaterials[index];
-						if (m != null) return m.ToString();
-						else return "Empty";
+						if (m != null) name = m.DebugName;
+						name = "Material " + index + " " + name;
+						return string.Format("{0,-30}---  >", name);
 					});
 				list.Add(labelm);
 				var btn1 = new Lilium.Controls.Button("Choose", () =>
@@ -189,7 +191,7 @@ namespace Lilium
 		}
 
 		public Controls.Control[] Controls { get { return controls; } }
-		public string TextOnList { get { return Name; } }
+		public string NameInObjectList { get { return Name; } }
 
 		#endregion
 	}

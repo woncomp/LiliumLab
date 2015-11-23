@@ -147,16 +147,17 @@
     <Compile Include="Material.cs" />
     <Compile Include="MaterialSerializing.cs" />
     <Compile Include="MaterialVariable.cs" />
+    <Compile Include="MeshPreview.cs" />
     <Compile Include="ResourceManager.cs" />
     <Compile Include="Scene.cs" />
     <Compile Include="InternalResources.cs" />
     <Compile Include="Mesh.cs" />
-    <Compile Include="Game_Preview.cs" />
     <Compile Include="Game_Info.cs" />
     <Compile Include="Game_Render.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="SceneSerializing.cs" />
+    <Compile Include="TexturePreview.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Controls\Button.resx">

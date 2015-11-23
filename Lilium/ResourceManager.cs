@@ -151,6 +151,7 @@ namespace Lilium
 		{
 			var tex = ShaderResourceView.FromFile(device, filePath);
 			tex.DebugName = Path.GetFileNameWithoutExtension(filePath);
+			Game.Instance.AddResource(tex);
 			return tex;
 		}
 	}
@@ -218,6 +219,7 @@ namespace Lilium
 				mesh = Mesh.CreateFromFile(filePath);
 			}
 			mesh.ResourceName = LoadingResourceName;
+			Game.Instance.AddObject(mesh);
 			return mesh;
 		}
 	}

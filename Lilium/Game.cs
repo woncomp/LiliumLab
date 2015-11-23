@@ -91,7 +91,6 @@ namespace Lilium
 			this.ResourceManager.SearchPaths.Add("../../../InternalAssets/");
 			this.ResourceManager.SearchPaths.Add("./");
 			Info_Init();
-			Preview_Init();
 			Time_Init();
 			InitShaderBuffers();
 
@@ -129,16 +128,15 @@ namespace Lilium
 			OnUpdate();
 
 			grid.Draw();
-			Preview_Render();
 			Info_UpdateData();
 
-			DebugLines.Instance.Update(previewSuppressDebugLines);
+			DebugLines.Instance.Update(Config.PreviewSuppressDebugLines);
 		}
 
 		public void Dispose()
 		{
+			SelectedObject = null;
 			Utilities.Dispose(ref MainScene);
-			Preview_Dispose();
 			for (int i = _disposeList.Count; i > 0; )
 			{
 				--i;

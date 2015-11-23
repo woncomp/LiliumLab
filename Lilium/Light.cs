@@ -97,7 +97,7 @@ namespace Lilium
 			controls = new Controls.Control[] { lightInfo, lightSlider, lightToggle, ambient, diffuse };
 		}
 		public Controls.Control[] Controls { get { return controls; } }
-		public string TextOnList { get { return Name; } }
+		public string NameInObjectList { get { return Name; } }
 
 		#endregion
 	}

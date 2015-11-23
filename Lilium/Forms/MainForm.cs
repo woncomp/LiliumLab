@@ -30,7 +30,7 @@ namespace Lilium
 
 		public void AddObject(ISelectable obj)
 		{
-			lbObjects.Items.Add(new ListBoxItem() { target = obj });
+			lbObjects.Items.Add(new ListBoxItem( obj ));
 		}
 
 		protected override void OnCreateControl()
@@ -79,8 +79,24 @@ namespace Lilium
 		class ListBoxItem
 		{
 			public ISelectable target;
+			public string Name;
 
-			public override string ToString() { return string.Format("{0,-20} {1}", target.GetType().Name, target.TextOnList); }
+			public ListBoxItem(ISelectable target)
+			{
+				this.target = target;
+				var attr = target.GetType().GetCustomAttributes(typeof(CustomSelectedTypeNameAttribute), false);
+				if(attr.Length > 0)
+				{
+					Name = (attr[0] as CustomSelectedTypeNameAttribute).TypeName;
+				}
+				else
+				{
+					Name = target.GetType().Name;
+				}
+				Name = string.Format("{0,-20} {1}", Name, target.NameInObjectList);
+			}
+
+			public override string ToString() { return Name; }
 		}
 	}
 }

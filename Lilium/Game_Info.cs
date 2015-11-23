@@ -26,18 +26,6 @@ namespace Lilium
 		{
 			MainForm.Instance.SelectedObjectChanged += Info_SetSelcectedObject;
 
-			if(true)
-			{
-				var toggle = new Toggle("Draw TBN", () => Config.DrawTBN, val => Config.DrawTBN = val);
-				AddControl(toggle);
-				var slider = new Slider("Draw TBN Offset", 0, 2, () => Config.TBNOffset, val => Config.TBNOffset = val);
-				AddControl(slider);
-			}
-			if(true)
-			{
-				var toggle = new Toggle("Draw Wireframe", () => Config.DrawWireframe, val => Config.DrawWireframe = val);
-				AddControl(toggle);
-			}
 		}
 
 		void Info_Scan()
@@ -63,10 +51,14 @@ namespace Lilium
 			{
 				info.UpdateData();
 			}
+			var preview = selectedObject as IPreviewable;
+			if (preview != null) preview.PreviewDraw();
 		}
 
 		void Info_SetSelcectedObject(ISelectable obj)
 		{
+			var preview = selectedObject as IPreviewable;
+			if (preview != null) preview.PreviewDeactive();
 			if (selectedObjectControls.Count > 0)
 			{
 				for (int i = selectedObjectControls.Count - 1; i >= 0; --i) 
@@ -79,7 +71,7 @@ namespace Lilium
 			if (selectedObject != null)
 			{
 				{
-					var str = string.Format("{0}({1})", selectedObject.TextOnList, selectedObject.GetType().Name);
+					var str = string.Format("{0}({1})", selectedObject.NameInObjectList, selectedObject.GetType().Name);
 					var str2 = string.Format("{0,-30}=== >", str);
 					var label = new Label("<< ===", () => str2);
 					AddControl(label);
@@ -101,12 +93,20 @@ namespace Lilium
 					selectedObjectControls.Add(c);
 				}
 			}
+			preview = selectedObject as IPreviewable;
+			if (preview != null) preview.PreviewActive();
 		}
 
 		public void AddObject(ISelectable obj)
 		{
 			if (obj == null) return;
 			MainForm.Instance.AddObject(obj);
+		}
+
+		public void AddResource(SharpDX.Direct3D11.ShaderResourceView texture)
+		{
+			if (texture == null) return;
+			MainForm.Instance.AddObject(new TexturePreview(texture));
 		}
 
 		public void AddControl(Lilium.Controls.Control control)
@@ -125,6 +125,19 @@ namespace Lilium
 	public interface ISelectable
 	{
 		Control[] Controls { get; }
-		string TextOnList { get; }
+		string NameInObjectList { get; }
+	}
+
+	public interface IPreviewable
+	{
+		void PreviewDraw();
+		void PreviewActive();
+		void PreviewDeactive();
+	}
+
+	public class CustomSelectedTypeNameAttribute : Attribute
+	{
+		public string TypeName { get; private set; }
+		public CustomSelectedTypeNameAttribute(string name) { TypeName = name; }
 	}
 }
