@@ -161,31 +161,33 @@ namespace Lilium
 			list.Add(toggle);
 			for (int i = 0; i < Mesh.SubmeshCount; ++i)
 			{
-				int index = i;
-				var labelm = new Lilium.Controls.Label("<  ---", () =>
-					{
-						string name = "Empty";
-						var m = SubmeshMaterials[index];
-						if (m != null) name = m.DebugName;
-						name = "Material " + index + " : " + name;
-						return string.Format("{0,-30}---  >", name);
-					});
-				list.Add(labelm);
-				var btn1 = new Lilium.Controls.Button("Browse", () =>
-				{
-					var resName = ResourceBrowser.ChooseMaterial();
-					if (!string.IsNullOrEmpty(resName))
-					{
-						SubmeshMaterials[index] = Game.Instance.ResourceManager.Material.Load(resName);
-					}
-				});
-				list.Add(btn1);
-				var btn2 = new Lilium.Controls.Button("Select", () =>
-				{
-					var m = SubmeshMaterials[index];
-					if (m != null) Game.Instance.SelectedObject = m;
-				});
-				list.Add(btn2);
+				//int index = i;
+				//var labelm = new Lilium.Controls.Label("<  ---", () =>
+				//	{
+				//		string name = "Empty";
+				//		var m = SubmeshMaterials[index];
+				//		if (m != null) name = m.DebugName;
+				//		name = "Material " + index + " : " + name;
+				//		return string.Format("{0,-30}---  >", name);
+				//	});
+				//list.Add(labelm);
+				//var btn1 = new Lilium.Controls.Button("Browse", () =>
+				//{
+				//	var resName = ResourceBrowser.ChooseMaterial();
+				//	if (!string.IsNullOrEmpty(resName))
+				//	{
+				//		SubmeshMaterials[index] = Game.Instance.ResourceManager.Material.Load(resName);
+				//	}
+				//});
+				//list.Add(btn1);
+				//var btn2 = new Lilium.Controls.Button("Select", () =>
+				//{
+				//	var m = SubmeshMaterials[index];
+				//	if (m != null) Game.Instance.SelectedObject = m;
+				//});
+				//list.Add(btn2);
+
+				list.Add(new Lilium.Controls.EntityMaterialSlot(this, i));
 			}
 			controls = list.ToArray();
 		}

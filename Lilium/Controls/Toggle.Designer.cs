@@ -35,7 +35,7 @@
 			// checkBox1
 			// 
 			this.checkBox1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-			this.checkBox1.Location = new System.Drawing.Point(315, 0);
+			this.checkBox1.Location = new System.Drawing.Point(334, 0);
 			this.checkBox1.Name = "checkBox1";
 			this.checkBox1.Size = new System.Drawing.Size(23, 20);
 			this.checkBox1.TabIndex = 4;
