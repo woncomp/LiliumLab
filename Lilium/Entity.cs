@@ -167,11 +167,11 @@ namespace Lilium
 						string name = "Empty";
 						var m = SubmeshMaterials[index];
 						if (m != null) name = m.DebugName;
-						name = "Material " + index + " " + name;
+						name = "Material " + index + " : " + name;
 						return string.Format("{0,-30}---  >", name);
 					});
 				list.Add(labelm);
-				var btn1 = new Lilium.Controls.Button("Choose", () =>
+				var btn1 = new Lilium.Controls.Button("Browse", () =>
 				{
 					var resName = ResourceBrowser.ChooseMaterial();
 					if (!string.IsNullOrEmpty(resName))

@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
-using Lilium.Controls;
 using System.Reflection;
+using Lilium.Controls;
+using Control = Lilium.Controls.Control;
 
 namespace Lilium
 {
@@ -72,8 +73,7 @@ namespace Lilium
 			{
 				{
 					var str = string.Format("{0}({1})", selectedObject.NameInObjectList, selectedObject.GetType().Name);
-					var str2 = string.Format("{0,-30}=== >", str);
-					var label = new Label("<< ===", () => str2);
+					var label = new SelectionTargetHeader(str);
 					AddControl(label);
 					selectedObjectControls.Add(label);
 				}
@@ -109,16 +109,25 @@ namespace Lilium
 			MainForm.Instance.AddObject(new TexturePreview(texture));
 		}
 
-		public void AddControl(Lilium.Controls.Control control)
+		public void AddControl(Control control)
 		{
 			infoControls.Add(control);
 			MainForm.Instance.InfoContainer.Controls.Add(control);
 		}
 
-		public void RemoveControl(Lilium.Controls.Control control)
+		public void RemoveControl(Control control)
 		{
 			MainForm.Instance.InfoContainer.Controls.Remove(control);
 			infoControls.Remove(control);
+		}
+
+		public void InsertControl(Control control, Control before, bool belongsToSelectedObject = false)
+		{
+			int index = MainForm.Instance.InfoContainer.Controls.IndexOf(before);
+			MainForm.Instance.InfoContainer.Controls.Add(control);
+			if (index >= 0) MainForm.Instance.InfoContainer.Controls.SetChildIndex(control, index);
+			infoControls.Add(control);
+			if (belongsToSelectedObject) selectedObjectControls.Add(control);
 		}
 	}
 

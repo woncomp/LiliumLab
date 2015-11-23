@@ -50,7 +50,7 @@
 			// 
 			this.splitContainer1.Panel2.Controls.Add(this.InfoContainer);
 			this.splitContainer1.Size = new System.Drawing.Size(1264, 761);
-			this.splitContainer1.SplitterDistance = 876;
+			this.splitContainer1.SplitterDistance = 874;
 			this.splitContainer1.SplitterWidth = 1;
 			this.splitContainer1.TabIndex = 1;
 			// 
@@ -64,7 +64,7 @@
 			this.InfoContainer.Margin = new System.Windows.Forms.Padding(0);
 			this.InfoContainer.MaximumSize = new System.Drawing.Size(9999, 9999);
 			this.InfoContainer.Name = "InfoContainer";
-			this.InfoContainer.Size = new System.Drawing.Size(385, 759);
+			this.InfoContainer.Size = new System.Drawing.Size(387, 759);
 			this.InfoContainer.TabIndex = 2;
 			// 
 			// lbObjects

@@ -97,6 +97,30 @@
     <Compile Include="Controls\Label.Designer.cs">
       <DependentUpon>Label.cs</DependentUpon>
     </Compile>
+    <Compile Include="Controls\MaterialHeader.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\MaterialHeader.Designer.cs">
+      <DependentUpon>MaterialHeader.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PassHeader.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\PassHeader.Designer.cs">
+      <DependentUpon>PassHeader.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\PassTextureSlot.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\PassTextureSlot.Designer.cs">
+      <DependentUpon>PassTextureSlot.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\SelectionTargetHeader.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\SelectionTargetHeader.Designer.cs">
+      <DependentUpon>SelectionTargetHeader.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\TextArea.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -109,11 +133,11 @@
     <Compile Include="Forms\ResourceBrowser.Designer.cs">
       <DependentUpon>ResourceBrowser.cs</DependentUpon>
     </Compile>
-    <Compile Include="Forms\MaterialEditor.cs">
+    <Compile Include="Forms\PropertiesForm.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Forms\MaterialEditor.Designer.cs">
-      <DependentUpon>MaterialEditor.cs</DependentUpon>
+      <DependentUpon>PropertiesForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Controls\RenderControl.cs">
       <SubType>UserControl</SubType>
@@ -175,11 +199,23 @@
     <EmbeddedResource Include="Controls\Label.resx">
       <DependentUpon>Label.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Controls\MaterialHeader.resx">
+      <DependentUpon>MaterialHeader.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\PassHeader.resx">
+      <DependentUpon>PassHeader.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\PassTextureSlot.resx">
+      <DependentUpon>PassTextureSlot.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Controls\SelectionTargetHeader.resx">
+      <DependentUpon>SelectionTargetHeader.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\TextArea.resx">
       <DependentUpon>TextArea.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="Forms\MaterialEditor.resx">
-      <DependentUpon>MaterialEditor.cs</DependentUpon>
+    <EmbeddedResource Include="Forms\PropertiesForm.resx">
+      <DependentUpon>PropertiesForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Controls\Slider.resx">
       <DependentUpon>Slider.cs</DependentUpon>

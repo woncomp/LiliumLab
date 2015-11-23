@@ -1,12 +1,12 @@
 {
   "Passes": [
     {
-      "ShaderFile": "Test.hlsl",
       "VariableValues": {
         "SomeColor": "1,1,1,1",
         "TestValue": "0.727;min=0;max=1"
       },
       "ShaderEntry": {
+        "ShaderFile": "Test.hlsl",
         "VertexShaderFunction": "VS",
         "PixelShaderFunction": "PS",
         "GeometryShaderFunction": null,
@@ -171,6 +171,7 @@
       ],
       "Textures": [
         {
+          "TextureFile": "parallax_diffuse.jpg",
           "AddressU": 3,
           "AddressV": 3,
           "AddressW": 3,
@@ -185,8 +186,7 @@
           "MaximumAnisotropy": 16,
           "MaximumLod": 0.0,
           "MinimumLod": 0.0,
-          "MipLodBias": 0.0,
-          "TextureFile": "Wood.png"
+          "MipLodBias": 0.0
         }
       ]
     }

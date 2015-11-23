@@ -90,6 +90,7 @@ namespace Lilium
 			SamplerStates = SamplerStateDescription.Default();
 			SamplerStates.MaximumLod = 0;
 			SamplerStates.MinimumLod = 0;
+			TextureFile = "white.png";
 		}
 	}
 
@@ -209,33 +210,46 @@ namespace Lilium
 		void CreateControls()
 		{
 			List<Lilium.Controls.Control> list = new List<Lilium.Controls.Control>();
-			var btn2 = new Lilium.Controls.Button("Reload", Reload);
-			list.Add(btn2);
-			var btn1 = new Lilium.Controls.Button("Edit", () =>
-			{
-				var editor = new MaterialEditor(this);
-				editor.Show();
-			});
-			list.Add(btn1);
-			if (IsValid)
-			{
-				var btn3 = new Lilium.Controls.Button("Save", () =>
-				{
-					Game.ResourceManager.Material.Save(this);
-				});
-				list.Add(btn3);
-				for (int i = 0; i < Passes.Length; ++i)
-				{
-					var passText = string.Format("{0,-30}---  >", "Pass " + i);
-					list.Add(new Lilium.Controls.Label("<  --- ", () => passText));
-					Passes[i].CreateAutoVariableControls(list);
-				}
-			}
-			else
+			list.Add(new Lilium.Controls.MaterialHeader(this));
+			if (!IsValid)
 			{
 				var textArea = new Lilium.Controls.TextArea();
 				textArea.Text = ErrorMessage;
 				list.Add(textArea);
+			}
+			for (int i = 0; i < Passes.Length; ++i)
+			{
+				var pass = Passes[i];
+				list.Add(new Lilium.Controls.PassHeader("< Pass " + i + " >", pass.Desc));
+				for (int j = 0; j < pass.Desc.Textures.Length; ++j)
+				{
+					list.Add(new Lilium.Controls.PassTextureSlot(pass, j));
+				}
+				Lilium.Controls.Control _insertAnchor = null;
+				var btn = new Lilium.Controls.Button("Add Texture", () =>
+				{
+					int index = pass.Desc.Textures.Length;
+					int size = index + 1;
+					Array.Resize(ref pass.Desc.Textures, size);
+					Array.Resize(ref pass.TextureList, size);
+					Array.Resize(ref pass.SamplerStateList, size);
+
+					pass.Desc.Textures[index] = new MaterialTextureDesc();
+					pass.TextureList[index] = Game.ResourceManager.Tex2D.Load(pass.Desc.Textures[index].TextureFile);
+
+					Game.InsertControl(new Lilium.Controls.PassTextureSlot(pass, index), _insertAnchor, true);
+				});
+				_insertAnchor = btn;
+				list.Add(btn);
+
+				if (pass.IsValid)
+				{
+					Passes[i].CreateAutoVariableControls(list);
+				}
+				else
+				{
+					list.Add(new Lilium.Controls.Label("XXXXXX", () => "Pass Error !!!"));
+				}
 			}
 			controls = list.ToArray();
 		}

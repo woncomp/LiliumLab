@@ -20,6 +20,9 @@ namespace LiliumLab
 		{
 			ResourceManager.SearchPaths.Add("../../Test");
 
+			var path = System.IO.Path.Combine(Game.Instance.ResourceManager.FirstSearchFolder, "MainScene.txt");
+			if (System.IO.File.Exists(path))
+				MainScene.Load(path);
 		}
 
 		protected override void OnUpdate()

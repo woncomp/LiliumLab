@@ -63,8 +63,6 @@ namespace Lilium.Serializing
 
 	class MaterialPass
 	{
-		public string ShaderFile;
-
 		public ShaderEntry ShaderEntry { get; set; }
 		public RasterizerState RasterizerStates { get; set; }
 		public BlendState BlendStates { get; set; }
@@ -85,7 +83,6 @@ namespace Lilium.Serializing
 
 		public void Import(MaterialPassDesc desc)
 		{
-			ShaderFile = desc.ShaderFile;
 			ShaderEntry.Import(ref desc);
 			RasterizerStates.Import(ref desc.RasteriazerStates);
 			BlendStates.Import(ref desc.BlendStates);
@@ -99,7 +96,6 @@ namespace Lilium.Serializing
 
 		public void Export(MaterialPassDesc desc)
 		{
-			desc.ShaderFile = ShaderFile;
 			ShaderEntry.Export(ref desc);
 			RasterizerStates.Export(ref desc.RasteriazerStates);
 			BlendStates.Export(ref desc.BlendStates);
@@ -116,6 +112,8 @@ namespace Lilium.Serializing
 	[JsonObject]
 	class ShaderEntry
 	{
+		public string ShaderFile;
+
 		public string VertexShaderFunction { get; set; }
 		public string PixelShaderFunction { get; set; }
 		public string GeometryShaderFunction { get; set; }
@@ -124,6 +122,7 @@ namespace Lilium.Serializing
 
 		public void Import(ref MaterialPassDesc desc)
 		{
+			ShaderFile = desc.ShaderFile;
 			VertexShaderFunction = desc.VertexShaderFunction;
 			PixelShaderFunction = desc.PixelShaderFunction;
 			GeometryShaderFunction = desc.GeometryShaderFunction;
@@ -133,6 +132,7 @@ namespace Lilium.Serializing
 
 		public void Export(ref MaterialPassDesc desc)
 		{
+			desc.ShaderFile = ShaderFile;
 			desc.VertexShaderFunction = VertexShaderFunction;
 			desc.PixelShaderFunction = PixelShaderFunction;
 			desc.GeometryShaderFunction = GeometryShaderFunction;
@@ -373,24 +373,46 @@ namespace Lilium.Serializing
 		public float MinimumLod { get; set; }
 		public float MipLodBias { get; set; }
 
-		public string TextureFile { get; set; }
+		public string TextureFile;
+
+		public void Import(MaterialTextureDesc src)
+		{
+			var dest = this;
+			dest.AddressU = src.SamplerStates.AddressU;
+			dest.AddressV = src.SamplerStates.AddressV;
+			dest.AddressW = src.SamplerStates.AddressW;
+			dest.BorderColor = src.SamplerStates.BorderColor;
+			dest.ComparisonFunction = src.SamplerStates.ComparisonFunction;
+			dest.Filter = src.SamplerStates.Filter;
+			dest.MaximumAnisotropy = src.SamplerStates.MaximumAnisotropy;
+			dest.MaximumLod = src.SamplerStates.MaximumLod;
+			dest.MinimumLod = src.SamplerStates.MinimumLod;
+			dest.MipLodBias = src.SamplerStates.MipLodBias;
+			dest.TextureFile = src.TextureFile;
+		}
+
+		public void Export(MaterialTextureDesc dest)
+		{
+			var src = this;
+			dest.SamplerStates.AddressU = src.AddressU;
+			dest.SamplerStates.AddressV = src.AddressV;
+			dest.SamplerStates.AddressW = src.AddressW;
+			dest.SamplerStates.BorderColor = src.BorderColor;
+			dest.SamplerStates.ComparisonFunction = src.ComparisonFunction;
+			dest.SamplerStates.Filter = src.Filter;
+			dest.SamplerStates.MaximumAnisotropy = src.MaximumAnisotropy;
+			dest.SamplerStates.MaximumLod = src.MaximumLod;
+			dest.SamplerStates.MinimumLod = src.MinimumLod;
+			dest.SamplerStates.MipLodBias = src.MipLodBias;
+			dest.TextureFile = src.TextureFile;
+		}
 
 		public static MaterialTexture[] Import(MaterialTextureDesc[] src)
 		{
 			return src.Select(e =>
 			{
 				var dest = new MaterialTexture();
-				dest.AddressU = e.SamplerStates.AddressU;
-				dest.AddressV = e.SamplerStates.AddressV;
-				dest.AddressW = e.SamplerStates.AddressW;
-				dest.BorderColor = e.SamplerStates.BorderColor;
-				dest.ComparisonFunction = e.SamplerStates.ComparisonFunction;
-				dest.Filter = e.SamplerStates.Filter;
-				dest.MaximumAnisotropy = e.SamplerStates.MaximumAnisotropy;
-				dest.MaximumLod = e.SamplerStates.MaximumLod;
-				dest.MinimumLod = e.SamplerStates.MinimumLod;
-				dest.MipLodBias = e.SamplerStates.MipLodBias;
-				dest.TextureFile = e.TextureFile;
+				dest.Import(e);
 				return dest;
 			}).ToArray();
 		}
@@ -400,17 +422,7 @@ namespace Lilium.Serializing
 			return src.Select(e =>
 			{
 				var dest = new MaterialTextureDesc();
-				dest.SamplerStates.AddressU = e.AddressU;
-				dest.SamplerStates.AddressV = e.AddressV;
-				dest.SamplerStates.AddressW = e.AddressW;
-				dest.SamplerStates.BorderColor = e.BorderColor;
-				dest.SamplerStates.ComparisonFunction = e.ComparisonFunction;
-				dest.SamplerStates.Filter = e.Filter;
-				dest.SamplerStates.MaximumAnisotropy = e.MaximumAnisotropy;
-				dest.SamplerStates.MaximumLod = e.MaximumLod;
-				dest.SamplerStates.MinimumLod = e.MinimumLod;
-				dest.SamplerStates.MipLodBias = e.MipLodBias;
-				dest.TextureFile = e.TextureFile;
+				e.Export(dest);
 				return dest;
 			}).ToArray();
 		}

@@ -46,7 +46,7 @@ namespace Lilium
 			return FindValidResourceFilePath(shaderName, SUBFOLDER_SHADER);
 		}
 
-		string FindValidResourceFilePath(string resName, string subfolder)
+		public string FindValidResourceFilePath(string resName, string subfolder)
 		{
 			for (int i = SearchPaths.Count - 1; i >= 0; --i)
 			{
