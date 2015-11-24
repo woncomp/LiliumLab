@@ -29,7 +29,7 @@ PS_IN VS(VS_IN input)
 	output.position = mul(output.position, matView);
 	output.position = mul(output.position, matProjection);
 
-	output.normalW = mul(input.normal, matWorld);
+	output.normalW = mul(input.normal, matWorldInverseTranspose);
 	output.eyeDirW = (eyePos - input.position).xyz;
 	output.texCoord = input.texCoord;
 

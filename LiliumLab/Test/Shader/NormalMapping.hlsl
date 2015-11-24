@@ -28,9 +28,9 @@ PS_IN VS(VS_IN input)
 	output.position = mul(output.position, matView);
 	output.position = mul(output.position, matProjection);
 
-	output.positionW = mul(input.position, matWorld);
-	output.normalW = mul(input.normal, matWorld);
-	output.tangentW = mul(input.tangent, matWorld);
+	output.positionW = mul(input.position, matWorldInverseTranspose);
+	output.normalW = mul(input.normal, matWorldInverseTranspose);
+	output.tangentW = mul(input.tangent, matWorldInverseTranspose);
 	output.texCoord = input.texCoord;
 
 	return output;

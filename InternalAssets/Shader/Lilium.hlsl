@@ -13,6 +13,7 @@ cbuffer LiliumPerFrame : register(b1)
 cbuffer LiliumPerObject : register(b2)
 {
 	float4x4 matWorld;
+	float4x4 matWorldInverseTranspose;
 };
 
 struct VS_IN

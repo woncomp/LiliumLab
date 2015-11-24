@@ -145,6 +145,7 @@ namespace Lilium
 		struct LiliumPerObjectData
 		{
 			public Matrix matWorld;
+			public Matrix matWorldInverseTranspose;
 		}
 
 		Buffer perFrameBuffer;
@@ -179,6 +180,7 @@ namespace Lilium
 		{
 			var data = new LiliumPerObjectData();
 			data.matWorld = objectTransform;
+			data.matWorldInverseTranspose = Matrix.Invert(Matrix.Transpose(objectTransform));
 			DeviceContext.UpdateSubresource(ref data, perObjectBuffer);
 			DeviceContext.VertexShader.SetConstantBuffer(2, perObjectBuffer);
 			DeviceContext.PixelShader.SetConstantBuffer(2, perObjectBuffer);
