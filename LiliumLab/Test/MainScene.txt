@@ -27,6 +27,34 @@
         "IsNormalized": false,
         "IsZero": false
       }
+    },
+    {
+      "Mesh": "table.obj",
+      "Materials": [
+        "Wood.lm",
+        "Lambert.lm"
+      ],
+      "Position": {
+        "X": 17.08351,
+        "Y": 0.0,
+        "Z": 0.0,
+        "IsNormalized": false,
+        "IsZero": false
+      },
+      "Rotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0,
+        "IsNormalized": false,
+        "IsZero": true
+      },
+      "Scale": {
+        "X": 1.0,
+        "Y": 1.0,
+        "Z": 1.0,
+        "IsNormalized": false,
+        "IsZero": false
+      }
     }
   ]
 }

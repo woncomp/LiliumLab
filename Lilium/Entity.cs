@@ -26,7 +26,7 @@ namespace Lilium
 				var matTranslation = Matrix.Translation(Position);
 				var matRotation = Matrix.RotationYawPitchRoll(Rotation.Y, Rotation.X, Rotation.Z);
 				var matScale = Matrix.Scaling(Scale);
-				return matTranslation * matRotation * matScale;
+				return matScale * matRotation * matTranslation;
 			}
 		}
 
