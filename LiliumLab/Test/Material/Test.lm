@@ -172,7 +172,7 @@
       ],
       "Textures": [
         {
-          "TextureFile": "wood.png",
+          "TextureFile": "white.png",
           "AddressU": 3,
           "AddressV": 3,
           "AddressW": 3,

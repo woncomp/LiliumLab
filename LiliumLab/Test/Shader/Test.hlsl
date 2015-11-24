@@ -7,16 +7,16 @@
 			public Matrix matView;
 			public Matrix matProjection;
 			public Vector4 lightDir;
-			public Vector4 ambientColor;
-			public Vector4 diffuseColor;
+			public Vector4 lightAmbient;
+			public Vector4 lightDiffuse;
 		}
 
 			var data = new ShaderData();
 			data.matView = ActiveCamera.ViewMatrix;
 			data.matProjection = ActiveCamera.ProjectionMatrix;
 			data.lightDir = LightDir4;
-			data.ambientColor = new Vector4(ambient, ambient, ambient, 1);
-			data.diffuseColor = new Vector4(diffuse, diffuse, diffuse, 1);
+			data.lightAmbient = new Vector4(ambient, ambient, ambient, 1);
+			data.lightDiffuse = new Vector4(diffuse, diffuse, diffuse, 1);
 */
 
 cbuffer data
@@ -61,7 +61,7 @@ float4 PS(PS_IN input) : SV_Target
 	baseMapValue = baseMap.Sample(s, input.texCoord);
 	normalW = normalize(input.normalW);
 	l = saturate(dot(normalW, lightDir));
-	color = ambientColor + l * diffuseColor;
+	color = lightAmbient + l * lightDiffuse;
 
 	return baseMapValue * color * TestValue * SomeColor;
 }

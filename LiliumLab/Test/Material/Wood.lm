@@ -131,6 +131,7 @@
         "StencilReadMask": 255,
         "StencilWriteMask": 255
       },
+      "StencilRef": 0,
       "InputElements": [
         {
           "AlignedByteOffset": 0,
@@ -171,7 +172,7 @@
       ],
       "Textures": [
         {
-          "TextureFile": "parallax_diffuse.jpg",
+          "TextureFile": "wood.png",
           "AddressU": 3,
           "AddressV": 3,
           "AddressW": 3,

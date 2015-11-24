@@ -35,7 +35,7 @@ float4 PS(PS_IN input) : SV_Target
 
 	normalW = normalize(input.normalW);
 	l = saturate(dot(normalW, lightDir));
-	color = ambientColor + l * diffuseColor;
+	color = lightAmbient + l * lightDiffuse;
 
 	return TableColor * color;
 }

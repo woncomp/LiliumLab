@@ -3,15 +3,15 @@
     {
       "Mesh": "table.obj",
       "Materials": [
-        "Test.lm",
-        "Wood.lm"
+        "Wood.lm",
+        "NormalMapping.lm"
       ],
       "Position": {
-        "X": 0.0,
+        "X": -4.296878,
         "Y": 0.0,
-        "Z": 0.0,
+        "Z": -1.26160765,
         "IsNormalized": false,
-        "IsZero": true
+        "IsZero": false
       },
       "Rotation": {
         "X": 0.0,
@@ -31,13 +31,13 @@
     {
       "Mesh": "table.obj",
       "Materials": [
-        "Wood.lm",
+        "Test.lm",
         "Lambert.lm"
       ],
       "Position": {
-        "X": 17.08351,
+        "X": 13.0905237,
         "Y": 0.0,
-        "Z": 0.0,
+        "Z": -0.9679224,
         "IsNormalized": false,
         "IsZero": false
       },
@@ -52,6 +52,60 @@
         "X": 1.0,
         "Y": 1.0,
         "Z": 1.0,
+        "IsNormalized": false,
+        "IsZero": false
+      }
+    },
+    {
+      "Mesh": "Internal_Sphere",
+      "Materials": [
+        "Phong.lm"
+      ],
+      "Position": {
+        "X": 0.0,
+        "Y": 4.99924564,
+        "Z": -9.021587,
+        "IsNormalized": false,
+        "IsZero": false
+      },
+      "Rotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0,
+        "IsNormalized": false,
+        "IsZero": true
+      },
+      "Scale": {
+        "X": 0.315020233,
+        "Y": 0.315020233,
+        "Z": 0.315020233,
+        "IsNormalized": false,
+        "IsZero": false
+      }
+    },
+    {
+      "Mesh": "Internal_Sphere",
+      "Materials": [
+        "Flat.lm"
+      ],
+      "Position": {
+        "X": 5.417028,
+        "Y": 4.90928,
+        "Z": 12.2455263,
+        "IsNormalized": false,
+        "IsZero": false
+      },
+      "Rotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0,
+        "IsNormalized": false,
+        "IsZero": true
+      },
+      "Scale": {
+        "X": 0.4161705,
+        "Y": 0.4161705,
+        "Z": 0.4161705,
         "IsNormalized": false,
         "IsZero": false
       }

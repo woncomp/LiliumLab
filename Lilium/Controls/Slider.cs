@@ -40,7 +40,7 @@ namespace Lilium.Controls
 		{
 			var v = _get();
 			_ignoreChange = true;
-			this.trackBar1.Value = (int)SharpDX.MathUtil.Lerp(this.trackBar1.Minimum, this.trackBar1.Maximum, (v - _min) / (_max - _min));
+			this.trackBar1.Value = (int)SharpDX.MathUtil.Lerp(this.trackBar1.Minimum, this.trackBar1.Maximum, SharpDX.MathUtil.Clamp((v - _min) / (_max - _min),0, 1));
 			_ignoreChange = false;
 
 			this.labelValue.Text = v.ToString();

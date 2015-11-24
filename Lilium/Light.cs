@@ -10,6 +10,7 @@ namespace Lilium
 	public class Light : ISelectable
 	{
 		public static Light MainLight;
+		public static bool IsPreviewingTexture = false;
 
 		public string Name;
 
@@ -56,7 +57,7 @@ namespace Lilium
 			LightDirection = LightPos;
 			LightDirection.Normalize();
 
-			if (DrawLight)
+			if (DrawLight && !IsPreviewingTexture)
 			{
 				var dir1 = -LightDirection;
 				var dir2 = dir1;

@@ -198,22 +198,22 @@ namespace Lilium
 
 		public static Mesh CreatePlane(float scale = 5)
 		{
-			return CreateFromFile(InternalResources.MESH_PLANE, true, false, scale);
+			return CreateFromFile(InternalResources.ROOT + "Mesh/" + InternalResources.MESH_PLANE, true, false, scale);
 		}
 
 		public static Mesh CreateCube(float scale = 5)
 		{
-			return CreateFromFile(InternalResources.MESH_CUBE, true, false, scale);
+			return CreateFromFile(InternalResources.ROOT + "Mesh/" + InternalResources.MESH_CUBE, true, false, scale);
 		}
 
 		public static Mesh CreateSphere(float scale = 10)
 		{
-			return CreateFromFile(InternalResources.MESH_SPHERE, true, false, scale);
+			return CreateFromFile(InternalResources.ROOT + "Mesh/" + InternalResources.MESH_SPHERE, true, false, scale);
 		}
 
 		public static Mesh CreateTeapot(float scale = 5)
 		{
-			return CreateFromFile(InternalResources.MESH_TEAPOT, true, false, scale);
+			return CreateFromFile(InternalResources.ROOT + "Mesh/" + InternalResources.MESH_TEAPOT, true, false, scale);
 		}
 
 		public static Mesh CreateFromFile(string filePath, bool rotateYZ = false, bool convertToLeftHanded = false, float scale = 1)

@@ -84,6 +84,8 @@ namespace Lilium
 			pass = new MaterialPass(Game.Instance.Device, passDesc, "Preview");
 
 			BuildVertexBuffer(tex.Description);
+
+			Light.IsPreviewingTexture = true;
 		}
 
 		void CreateTextureShaderResourceView(Texture2D tex)
@@ -170,6 +172,7 @@ namespace Lilium
 		
 		public void PreviewDeactive()
 		{
+			Light.IsPreviewingTexture = false;
 			Utilities.Dispose(ref pass);
 			Utilities.Dispose(ref vertexBuffer);
 			Utilities.Dispose(ref shaderResourceView);

@@ -62,6 +62,7 @@ namespace Lilium
 			var data = new ShaderData();
 			data.ShadowWorldTransform = transform * Matrix.Shadow(Light.MainLight.LightDir4, plane);
 			data.ShadowIndensity = shadowIndensity;
+			data.___ = Vector3.Zero;
 			game.DeviceContext.UpdateSubresource(ref data, buffer);
 			game.DeviceContext.VertexShader.SetConstantBuffer(0, buffer);
 			game.DeviceContext.PixelShader.SetConstantBuffer(0, buffer);

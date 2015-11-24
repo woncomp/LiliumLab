@@ -1,0 +1,61 @@
+#include <Lilium.hlsl>
+
+
+cbuffer data
+{
+	float4 AmbientColor = float4(0.2, 0.2, 0.2, 1);
+	float4 DiffuseColor = float4(0.2, 0.2, 0.2, 1);
+	float4 SpecularColor = float4(1, 1, 1, 1);
+	float Shininess  = 2.2;
+	float Ka = 0.5;
+	float Kd = 0.4;
+	float Ks = 0.8;
+};
+
+struct PS_IN
+{
+	float4 position : SV_POSITION;
+	float3 normalW : NORMAL;
+	float3 eyeDirW : NORMAL1;
+	float2 texCoord : TEXCOORD;
+};
+
+PS_IN VS(VS_IN input)
+{
+	PS_IN output = (PS_IN)0;
+	float4 posW;
+
+	output.position = mul(input.position, matWorld);
+	output.position = mul(output.position, matView);
+	output.position = mul(output.position, matProjection);
+
+	output.normalW = mul(input.normal, matWorld);
+	output.eyeDirW = (eyePos - input.position).xyz;
+	output.texCoord = input.texCoord;
+
+	return output;
+}
+
+float4 PS(PS_IN input) : SV_Target
+{
+	float4 ambient;
+	float4 diffuse;
+	float4 specular;
+	//float4 baseMapValue;
+	float3 normalW;
+	float3 eyeDirW;
+	float3 reflectW;
+	float l;
+
+	//baseMapValue = baseMap.Sample(s, input.texCoord);
+	ambient = AmbientColor * lightAmbient * Ka;
+
+	normalW = normalize(input.normalW);
+	diffuse = DiffuseColor * lightDiffuse * saturate(dot(normalW, lightDir)) * Kd;
+
+	reflectW = reflect(-lightDir.xyz, normalW);
+	eyeDirW = normalize(input.eyeDirW);
+	specular = SpecularColor * pow(saturate(dot(reflectW, eyeDirW)), Shininess) * Ks;
+
+	return ambient + diffuse + specular;
+}

@@ -56,27 +56,6 @@ namespace Lilium
 		private Skydome skydome;
 		private List<IDisposable> _disposeList = new List<IDisposable>();
 		
-		public virtual string ResourceFolder { get { return ""; } }
-
-		[Obsolete]
-		public void LoadTexture(string path, out ShaderResourceView tex)
-		{
-			if (!path.StartsWith("..")) path = ResourceFolder + path;
-			tex = ShaderResourceView.FromFile(Device, path);
-			AutoDispose(tex);
-		}
-
-		[Obsolete]
-		public void LoadMesh(string path, out Mesh mesh)
-		{
-			if (!path.StartsWith("..")) path = ResourceFolder + path;
-			if (path.EndsWith("txt", StringComparison.OrdinalIgnoreCase))
-				mesh = Mesh.CreateFromTXT(path);
-			else
-				mesh = Mesh.CreateFromFile(path);
-			AutoDispose(mesh);
-		}
-
 		public void AutoDispose(IDisposable disposeable)
 		{
 			if (!_disposeList.Contains(disposeable))
@@ -119,7 +98,6 @@ namespace Lilium
 			DebugLines.Instance.Init();
 			AutoDispose(DebugLines.Instance);
 
-			AutoLoad_Scan();
 			OnStart();
 			Info_Scan();
 		}
