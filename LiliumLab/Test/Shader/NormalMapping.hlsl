@@ -28,7 +28,7 @@ PS_IN VS(VS_IN input)
 	output.position = mul(output.position, matView);
 	output.position = mul(output.position, matProjection);
 
-	output.positionW = mul(input.position, matWorldInverseTranspose);
+	output.positionW = mul(input.position, matWorld);
 	output.normalW = mul(input.normal, matWorldInverseTranspose);
 	output.tangentW = mul(input.tangent, matWorldInverseTranspose);
 	output.texCoord = input.texCoord;
@@ -66,7 +66,7 @@ float4 PS(PS_IN input) : SV_Target
 	l = saturate(dot(normalT, lightDirT));
 	diffuse = l * lightDiffuse;
 
-	eyeDirT = normalize(mul(tbn, (eyePos - input.positionW).xyz));
+	eyeDirT = normalize(mul(tbn, (input.positionW - eyePos).xyz));
 	halfT = (lightDirT + eyeDirT) * 0.5;
 	l = pow(saturate(dot(halfT, normalT)), 1 / SpecularPowerScale);
 	specular = float4(l, l, l, 1);
