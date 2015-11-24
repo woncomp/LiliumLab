@@ -53,6 +53,7 @@ namespace Lilium
 		public Lilium.Controls.RenderControl RenderControl;
 
 		private Grid grid;
+		private Skydome skydome;
 		private List<IDisposable> _disposeList = new List<IDisposable>();
 		
 		public virtual string ResourceFolder { get { return ""; } }
@@ -99,9 +100,6 @@ namespace Lilium
 			MainScene.Name = "Main Scene";
 			AddObject(MainScene);
 
-			StencilShadowRenderer = new Lilium.StencilShadowRenderer(this);
-			AutoDispose(StencilShadowRenderer);
-
 			Camera.MainCamera = new Camera();
 			Camera.MainCamera.Name = "Main Camera";
 			AddObject(Camera.MainCamera);
@@ -111,6 +109,11 @@ namespace Lilium
 			grid = new Grid(Device);
 			grid.Init();
 			AutoDispose(grid);
+			skydome = new Skydome(Device);
+			AutoDispose(skydome);
+
+			StencilShadowRenderer = new Lilium.StencilShadowRenderer(this);
+			AutoDispose(StencilShadowRenderer);
 
 			DebugLines.Instance = new DebugLines(Device);
 			DebugLines.Instance.Init();
@@ -128,6 +131,7 @@ namespace Lilium
 
 			Camera.MainCamera.Begin();
 			UpdatePerFrameBuffer();
+			skydome.Draw();
 			MainScene.Draw();
 			OnUpdate();
 

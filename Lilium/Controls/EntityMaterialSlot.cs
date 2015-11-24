@@ -52,8 +52,10 @@ namespace Lilium.Controls
 
 		void EntityMaterialSlot_Paint(object sender, PaintEventArgs e)
 		{
-			var b = entity.SubmeshMaterials[materialIndex].IsValid ? Brushes.Green : Brushes.Red;
-			e.Graphics.FillEllipse(b, 274, 0, 18, 18);
+			Brush brush = Brushes.Yellow;
+			var m = entity.SubmeshMaterials[materialIndex];
+			if(m != null) brush = m.IsValid ? Brushes.Green : Brushes.Red;
+			e.Graphics.FillEllipse(brush, 274, 0, 18, 18);
 		}
 	}
 }
