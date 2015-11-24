@@ -21,5 +21,8 @@ namespace Lilium
 		public static bool LoadMeshPrintLog = true;
 
 		public static bool PreviewSuppressDebugLines = false;
+
+		public static int MSAASampleCount = 4;
+		public static int MSAAQuality = 0;
 	}
 }

@@ -30,8 +30,10 @@ namespace Lilium
 		public float CameraYaw = 200;
 		public float CameraPitch = -30;
 
-		public bool ClearColorBuffer = true;
-		public Color ClearColor = new Color(0.95f);
+		//public bool ClearColorBuffer = true;
+		//public Color ClearColor = new Color(0.95f);
+		public Vector4 SkyBottomColor = new Vector4(0.89f, 0.89f, 0.91f, 1);
+		public Vector4 SkyTopColor = new Vector4(1, 1, 1, 1);
 		public DepthStencilClearFlags DepthStencilClearFlags = DepthStencilClearFlags.Depth | DepthStencilClearFlags.Stencil;
 		public float DepthClearValue = 1;
 		public byte StencilClearValue = 0;
@@ -61,8 +63,8 @@ namespace Lilium
 			var ratio = client.Width / (float)client.Height;
 			ProjectionMatrix = Matrix.PerspectiveFovLH(MathUtil.DegreesToRadians(FovDegrees), ratio, NearPlane, FarPlane);
 
-			if(ClearColorBuffer)
-				game.DeviceContext.ClearRenderTargetView(game.DefaultRenderTargetView, ClearColor);
+			//if(ClearColorBuffer)
+			//	game.DeviceContext.ClearRenderTargetView(game.DefaultRenderTargetView, ClearColor);
 			if(0 != (int)DepthStencilClearFlags)
 				game.DeviceContext.ClearDepthStencilView(game.DefaultDepthStencilView, DepthStencilClearFlags, DepthClearValue, StencilClearValue);
 		}
@@ -99,9 +101,11 @@ namespace Lilium
 			var slidery = new Lilium.Controls.Slider("Focus Point Y", -10, 10, () => FocusPoint.Y, val => FocusPoint.Y = val);
 			var sliderz = new Lilium.Controls.Slider("Focus Point Z", -10, 10, () => FocusPoint.Z, val => FocusPoint.Z = val);
 
-			var clearColor = new Lilium.Controls.ColorPicker("Clear Color", () => ClearColor.ToVector4(), val => ClearColor = new Color(val));
+			//var clearColor = new Lilium.Controls.ColorPicker("Clear Color", () => ClearColor.ToVector4(), val => ClearColor = new Color(val));
+			var sky1 = new Lilium.Controls.ColorPicker("Sky Bottom", () => SkyBottomColor, val => SkyBottomColor = val);
+			var sky2 = new Lilium.Controls.ColorPicker("Sky Top", () => SkyTopColor, val => SkyTopColor = val);
 
-			controls = new Controls.Control[] { cameraInfo, button, sliderx, slidery, sliderz, clearColor };
+			controls = new Controls.Control[] { cameraInfo, button, sliderx, slidery, sliderz, sky1, sky2 };
 		}
 
 		public Controls.Control[] Controls { get { return controls; } }

@@ -80,7 +80,7 @@ namespace Lilium.Controls
 			desc.IsWindowed = true;
 			desc.ModeDescription = new ModeDescription(RenderViewSize.Width, RenderViewSize.Height, new Rational(60, 1), Format.R8G8B8A8_UNorm);
 			desc.OutputHandle = ControlHandle;
-			desc.SampleDescription = new SampleDescription(1, 0);
+			desc.SampleDescription = new SampleDescription(Config.MSAASampleCount, Config.MSAAQuality);
 			desc.SwapEffect = SwapEffect.Discard;
 			desc.Usage = Usage.RenderTargetOutput;
 
@@ -137,7 +137,7 @@ namespace Lilium.Controls
 				MipLevels = 1,
 				Width = ClientSize.Width,
 				Height = ClientSize.Height,
-				SampleDescription = new SampleDescription(1, 0),
+				SampleDescription = new SampleDescription(Config.MSAASampleCount, Config.MSAAQuality),
 				Usage = ResourceUsage.Default,
 				BindFlags = BindFlags.DepthStencil,
 				CpuAccessFlags = CpuAccessFlags.None,

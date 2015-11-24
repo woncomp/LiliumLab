@@ -26,8 +26,6 @@ namespace Lilium
 		Buffer buffer;
 		Device device;
 
-		Data data;
-
 		public Skydome(Device device)
 		{
 			this.device = device;
@@ -41,8 +39,6 @@ namespace Lilium
 			pass = new MaterialPass(device, desc, "Skydome");
 			buffer = Material.CreateBuffer<Data>();
 
-			data.topColor = new Vector4(1, 1, 1, 1);
-			data.bottomColor = new Vector4(0.89f, 0.89f, 0.91f, 1);
 			//Game.Instance.AddControl(new Lilium.Controls.ColorPicker("Bottom", () => data.bottomColor, val => data.bottomColor = val));
 			//Game.Instance.AddControl(new Lilium.Controls.ColorPicker("Top", () => data.topColor, val => data.topColor = val));
 		}
@@ -51,7 +47,10 @@ namespace Lilium
 		{
 			pass.Apply();
 
+			var data = new Data();
 			data.matWorld2 = Matrix.Translation(Camera.ActiveCamera.Position);
+			data.bottomColor = Camera.ActiveCamera.SkyBottomColor;
+			data.topColor = Camera.ActiveCamera.SkyTopColor;
 			device.ImmediateContext.UpdateSubresource(ref data, buffer);
 			device.ImmediateContext.VertexShader.SetConstantBuffer(0, buffer);
 			device.ImmediateContext.PixelShader.SetConstantBuffer(0, buffer);
