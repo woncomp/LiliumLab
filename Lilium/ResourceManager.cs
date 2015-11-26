@@ -41,6 +41,11 @@ namespace Lilium
 			this.mesh = MeshLoader.Create<MeshLoader>(this);
 		}
 
+		public void Init()
+		{
+			this.material.Init();
+		}
+
 		public string FindValidShaderFilePath(string shaderName)
 		{
 			return FindValidResourceFilePath(shaderName, SUBFOLDER_SHADER);
@@ -159,6 +164,15 @@ namespace Lilium
 	public class MaterialLoader : Loader<Material>
 	{
 		public override string SubfolderName { get { return "Material"; } }
+		public Material DefaultDiffuse { get; private set; }
+
+		public void Init()
+		{
+			var desc = new MaterialDesc();
+			desc.Passes[0].ShaderFile = "DefaultDiffuse.hlsl";
+			DefaultDiffuse = new Material(Game.Instance, desc, "DefaultDiffuse");
+			Game.Instance.AutoDispose(DefaultDiffuse);
+		}
 
 		public void Save(Material material)
 		{
@@ -179,6 +193,7 @@ namespace Lilium
 			var desc = MaterialDesc.Load(filePath);
 			desc.ResourceName = LoadingResourceName;
 			var material = new Material(Game.Instance, desc, Path.GetFileNameWithoutExtension(LoadingResourceName));
+			Game.Instance.AddObject(material);
 			return material;
 		}
 	}

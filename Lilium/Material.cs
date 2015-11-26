@@ -131,8 +131,6 @@ namespace Lilium
 			this.debugName = debugName ?? "Material Object " + Debug.NextObjectId;
 
 			Load();
-
-			game.AddObject(this);
 		}
 
 		public void Reload()

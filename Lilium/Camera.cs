@@ -82,6 +82,11 @@ namespace Lilium
 				if (CameraPitch > 89) CameraPitch = 89;
 				if (CameraPitch < -89) CameraPitch = -89;
 			}
+			if(game.Input.GetMouseButton(System.Windows.Forms.MouseButtons.Middle))
+			{
+				var mouseLocDelta = game.Input.MouseLocationDelta;
+				FocusPoint.Y += mouseLocDelta.Height * 0.05f;
+			}
 			CameraDistance -= game.Input.MouseWheelDelta * 0.03f;
 			if (CameraDistance < 1) CameraDistance = 1;
 		}

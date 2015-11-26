@@ -111,7 +111,8 @@ namespace Lilium
 			{
 				if (i >= SubmeshMaterials.Length) continue;
 				var material = SubmeshMaterials[i];
-				if(material == null || !material.IsValid) continue;
+				if (material == null) material = Game.Instance.ResourceManager.Material.DefaultDiffuse;
+				if (!material.IsValid) continue;
 
 				for (int j = 0; j < material.Passes.Length; ++j)
 				{

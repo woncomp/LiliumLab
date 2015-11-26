@@ -71,6 +71,7 @@ namespace Lilium
 			this.ResourceManager = new ResourceManager(this);
 			this.ResourceManager.SearchPaths.Add("../../../InternalAssets/");
 			this.ResourceManager.SearchPaths.Add("./");
+			this.ResourceManager.Init();
 			Info_Init();
 			Time_Init();
 			InitShaderBuffers();

@@ -19,6 +19,8 @@ namespace Lilium
 		public BlendState AlphaBlendState { get { return _blendStateAlphaBlend; } }
 		public RasterizerState DefaultRasterizerState { get { return _rasterizerStateDefault; } }
 
+		public Viewport DefaultViewport { get; set; }
+
 		private SamplerState _samplerStateDefault;
 		private SamplerState _samplerStateWrap;
 		private BlendState _blendStateDefault;
@@ -30,6 +32,8 @@ namespace Lilium
 			CreateSamplerStates();
 			CreateBlendStates();
 			CreateRasterizerStates();
+
+			DefaultViewport = new Viewport(0, 0, RenderControl.ClientSize.Width, RenderControl.ClientSize.Height);
 		}
 		
 		void CreateSamplerStates()
