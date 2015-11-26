@@ -177,6 +177,9 @@
     <Compile Include="MaterialSerializing.cs" />
     <Compile Include="MaterialVariable.cs" />
     <Compile Include="MeshPreview.cs" />
+    <Compile Include="RenderTexture.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="ResourceManager.cs" />
     <Compile Include="Scene.cs" />
     <Compile Include="InternalResources.cs" />
