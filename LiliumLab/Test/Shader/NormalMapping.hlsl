@@ -23,14 +23,17 @@ PS_IN VS(VS_IN input)
 {
 	PS_IN output = (PS_IN)0;
 	float4 posW;
+	float4 posV;
 
-	output.position = mul(input.position, matWorld);
-	output.position = mul(output.position, matView);
-	output.position = mul(output.position, matProjection);
+	posW = mul(matWorld, input.position);
+	posV = mul(matView, posW);
 
-	output.positionW = mul(input.position, matWorld);
-	output.normalW = mul(input.normal, matWorldInverseTranspose);
-	output.tangentW = mul(input.tangent, matWorldInverseTranspose);
+	output.position = mul(matProjection, posV);
+
+	output.normalW = mul(matWorldInverseTranspose, input.normal);
+
+	output.positionW = posW;
+	output.tangentW = mul(matWorldInverseTranspose, input.tangent);
 	output.texCoord = input.texCoord;
 
 	return output;

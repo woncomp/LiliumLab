@@ -21,16 +21,16 @@ PS_IN VS(VS_IN input)
 	float4 posW;
 	float4 posV;
 
-	posW = mul(input.position, matWorld);
-	posV = mul(posW, matView);
+	posW = mul(matWorld, input.position);
+	posV = mul(matView, posW);
 
-	output.position = mul(posV, matProjection);
+	output.position = mul(matProjection, posV);
 
-	output.normalW = mul(input.normal, matWorldInverseTranspose);
+	output.normalW = mul(matWorldInverseTranspose, input.normal);
 	output.texCoord = input.texCoord;
 
 	output.linearDepth = (posV.z - nearPlane) / (farPlane - nearPlane);
-	output.normalV = mul(input.normal, matWorldViewInverseTranspose);
+	output.normalV = mul(matWorldViewInverseTranspose, input.normal);
 
 	return output;
 }

@@ -19,11 +19,10 @@ Texture2D baseMap : register(t0);
 PS_IN VS(VS_IN input)
 {
 	PS_IN output = (PS_IN)0;
-	float4 posW;
 
-	output.position = mul(input.position, matWorld2);
-	output.position = mul(output.position, matView);
-	output.position = mul(output.position, matProjection);
+	output.position = mul(matWorld2, input.position);
+	output.position = mul(matView, output.position);
+	output.position = mul(matProjection, output.position);
 
 	float3 dir = normalize(input.position.xyz);
 	output.texCoord = float2(0.5, dir.y * 0.5 + 0.5);

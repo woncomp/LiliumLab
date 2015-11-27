@@ -1,5 +1,3 @@
-#pragma pack_matrix( row_major )
-
 cbuffer data : register(b0)
 {
 	float4x4 matViewProj;
@@ -21,7 +19,7 @@ PS_IN VS(VS_IN i)
 {
 	PS_IN o = (PS_IN)0;
 
-	o.position = mul(i.position, matViewProj);
+	o.position = mul(matViewProj, i.position);
 	o.color = i.color;
 
 	return o;

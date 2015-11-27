@@ -1,5 +1,3 @@
-#pragma pack_matrix ( row_major )
-
 cbuffer LiliumPerFrame : register(b1)
 {
 	float4x4 matView;

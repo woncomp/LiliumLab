@@ -16,10 +16,12 @@ PS_IN VS(VS_IN input)
 {
 	PS_IN output = (PS_IN)0;
 	float4 posW;
+	float4 posV;
 
-	output.position = mul(input.position, ShadowWorldTransform);
-	output.position = mul(output.position, matView);
-	output.position = mul(output.position, matProjection);
+	posW = mul(ShadowWorldTransform, input.position);
+	posV = mul(matView, posW);
+
+	output.position = mul(matProjection, posV);
 
 	return output;
 }
