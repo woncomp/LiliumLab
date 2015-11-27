@@ -16,28 +16,39 @@ namespace LiliumLab
 	public class StatueGame : Game
 	{
 		Entity entity;
-		RenderTexture rt;
+		RenderTexture rtSSAOGeometry;
+		RenderTexture rtAmbientIndensity;
 
-		Material ssaoBuffer;
+		Material materialSSAOBuffer;
+		Postprocess ppSSAO;
 
 		protected override void OnStart()
 		{
 			ResourceManager.SearchPaths.Add("../../Statue/");
 
-			rt = new RenderTexture(this, 2);
-			AutoDispose(rt);
+			rtSSAOGeometry = new RenderTexture(this, 2);
+			AutoDispose(rtSSAOGeometry);
+
+			rtAmbientIndensity = new RenderTexture(this, 1);
+			AutoDispose(rtAmbientIndensity);
 
 			entity = new Entity("knight_statue.obj");
 			AutoDispose(entity);
 
-			ssaoBuffer = ResourceManager.Material.Load("SSAOBuffer.lm");
+			materialSSAOBuffer = ResourceManager.Material.Load("SSAOBuffer.lm");
+
+			ppSSAO = new Postprocess(this, "SSAOPostprocess.hlsl", rtAmbientIndensity);
+			AutoDispose(ppSSAO);
+			ppSSAO.SetShaderResourceViews(rtSSAOGeometry.GetShaderResourceViews());
 		}
 
 		protected override void OnUpdate()
 		{
-			rt.Begin();
-			entity.DrawWithMaterial(ssaoBuffer);
-			rt.End();
+			rtSSAOGeometry.Begin();
+			entity.DrawWithMaterial(materialSSAOBuffer);
+			rtSSAOGeometry.End();
+
+			ppSSAO.Draw();
 		}
 	}
 }
