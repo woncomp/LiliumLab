@@ -141,16 +141,24 @@ namespace Lilium
 			public Vector4 eyePos;
 			public Vector4 ambientColor;
 			public Vector4 diffuseColor;
+			public float renderTargetWidth;
+			public float renderTargetHeight;
+			public float cameraNearPlane;
+			public float cameraFarPlane;
 		}
 
 		struct LiliumPerObjectData
 		{
 			public Matrix matWorld;
 			public Matrix matWorldInverseTranspose;
+			public Matrix matWorldViewInverseTranspose;
 		}
 
 		Buffer perFrameBuffer;
 		Buffer perObjectBuffer;
+
+		LiliumPerFrameData perFrameData;
+		LiliumPerObjectData perObjectData;
 
 		void InitShaderBuffers()
 		{
@@ -165,24 +173,27 @@ namespace Lilium
 		{
 			var light = Light.MainLight;
 
-			var data = new LiliumPerFrameData();
-			data.matView = Camera.ActiveCamera.ViewMatrix;
-			data.matProjection = Camera.ActiveCamera.ProjectionMatrix;
-			data.lightDir = light.LightDir4;
-			data.eyePos = new Vector4(Camera.ActiveCamera.Position, 1);
-			data.ambientColor = light.AmbientColor;
-			data.diffuseColor = light.DiffuseColor;
-			DeviceContext.UpdateSubresource(ref data, perFrameBuffer);
+			perFrameData.matView = Camera.ActiveCamera.ViewMatrix;
+			perFrameData.matProjection = Camera.ActiveCamera.ProjectionMatrix;
+			perFrameData.lightDir = light.LightDir4;
+			perFrameData.eyePos = new Vector4(Camera.ActiveCamera.Position, 1);
+			perFrameData.ambientColor = light.AmbientColor;
+			perFrameData.diffuseColor = light.DiffuseColor;
+			perFrameData.renderTargetWidth = DefaultViewport.Width;
+			perFrameData.renderTargetHeight = DefaultViewport.Height;
+			perFrameData.cameraNearPlane = Camera.ActiveCamera.NearPlane;
+			perFrameData.cameraFarPlane = Camera.ActiveCamera.FarPlane;
+			DeviceContext.UpdateSubresource(ref perFrameData, perFrameBuffer);
 			DeviceContext.VertexShader.SetConstantBuffer(1, perFrameBuffer);
 			DeviceContext.PixelShader.SetConstantBuffer(1, perFrameBuffer);
 		}
 
 		public void UpdatePerObjectBuffer(Matrix objectTransform)
 		{
-			var data = new LiliumPerObjectData();
-			data.matWorld = objectTransform;
-			data.matWorldInverseTranspose = Matrix.Invert(Matrix.Transpose(objectTransform));
-			DeviceContext.UpdateSubresource(ref data, perObjectBuffer);
+			perObjectData.matWorld = objectTransform;
+			perObjectData.matWorldInverseTranspose = Matrix.Invert(Matrix.Transpose(objectTransform));
+			perObjectData.matWorldViewInverseTranspose = Matrix.Invert(Matrix.Transpose(perObjectData.matWorld * perFrameData.matView));
+			DeviceContext.UpdateSubresource(ref perObjectData, perObjectBuffer);
 			DeviceContext.VertexShader.SetConstantBuffer(2, perObjectBuffer);
 			DeviceContext.PixelShader.SetConstantBuffer(2, perObjectBuffer);
 		}

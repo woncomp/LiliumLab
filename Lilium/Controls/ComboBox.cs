@@ -50,12 +50,15 @@ namespace Lilium.Controls
 		public override void UpdateData()
 		{
 			if (_get == null) return;
-			var index = _get();
-			if (index != comboBox1.SelectedIndex)
+			if (!comboBox1.DroppedDown)
 			{
-				_ignoreChange = true;
-				comboBox1.SelectedIndex = index;
-				_ignoreChange = false;
+				var index = _get();
+				if (index != comboBox1.SelectedIndex)
+				{
+					_ignoreChange = true;
+					comboBox1.SelectedIndex = index;
+					_ignoreChange = false;
+				}
 			}
 		}
 

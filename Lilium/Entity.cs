@@ -103,24 +103,8 @@ namespace Lilium
 					Scale.Z += scaleDelta;
 				}
 			}
-			Game.Instance.UpdatePerObjectBuffer(TransformMatrix);
 
-			Mesh.DrawBegin();
-
-			for (int i = 0; i < Mesh.SubmeshCount; ++i)
-			{
-				if (i >= SubmeshMaterials.Length) continue;
-				var material = SubmeshMaterials[i];
-				if (material == null) material = Game.Instance.ResourceManager.Material.DefaultDiffuse;
-				if (!material.IsValid) continue;
-
-				for (int j = 0; j < material.Passes.Length; ++j)
-				{
-					material.Passes[j].Apply();
-					material.Passes[j].UpdateConstantBuffers();
-					Mesh.DrawSubmesh(i);
-				}
-			}
+			DrawWithMaterials(SubmeshMaterials);
 
 			if (StencilShadowIndensity > 0) DrawStencilShadow();
 
@@ -136,6 +120,41 @@ namespace Lilium
 				Debug.Line(Position, Position + Vector3.TransformNormal(Vector3.UnitY, rot) * scale, Color.Green);
 				Debug.Line(Position, Position + Vector3.TransformNormal(Vector3.UnitZ, rot) * scale, Color.Blue);
 			}
+		}
+
+		public void DrawWithMaterials(Material[] materials)
+		{
+			if (materials.Length < Mesh.SubmeshCount)
+				Debug.Log("[Entity::DrawWithMaterials] Length of provided material array doesn't match with the submesh count.(" + this.Name + ")");
+			Game.Instance.UpdatePerObjectBuffer(TransformMatrix);
+
+			Mesh.DrawBegin();
+
+			for (int i = 0; i < Mesh.SubmeshCount; ++i)
+			{
+				Material material = null;
+				if (materials != null)
+				{
+					if (i < materials.Length) material = materials[i];
+					else material = materials[materials.Length - 1];
+				}
+				if (material == null) material = Game.Instance.ResourceManager.Material.DefaultDiffuse;
+				if (!material.IsValid) continue;
+
+				for (int j = 0; j < material.Passes.Length; ++j)
+				{
+					material.Passes[j].Apply();
+					material.Passes[j].UpdateConstantBuffers();
+					Mesh.DrawSubmesh(i);
+				}
+			}
+		}
+
+		public void DrawWithMaterial(Material material)
+		{
+			Material[] materials = new Material[Mesh.SubmeshCount];
+			for (int i = 0; i < materials.Length; ++i) materials[i] = material;
+			DrawWithMaterials(materials);
 		}
 
 		void DrawStencilShadow()

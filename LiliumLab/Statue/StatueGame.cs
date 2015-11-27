@@ -18,21 +18,25 @@ namespace LiliumLab
 		Entity entity;
 		RenderTexture rt;
 
+		Material ssaoBuffer;
+
 		protected override void OnStart()
 		{
 			ResourceManager.SearchPaths.Add("../../Statue/");
 
-			rt = new RenderTexture(this);
+			rt = new RenderTexture(this, 2);
 			AutoDispose(rt);
 
 			entity = new Entity("knight_statue.obj");
 			AutoDispose(entity);
+
+			ssaoBuffer = ResourceManager.Material.Load("SSAOBuffer.lm");
 		}
 
 		protected override void OnUpdate()
 		{
 			rt.Begin();
-			entity.Draw();
+			entity.DrawWithMaterial(ssaoBuffer);
 			rt.End();
 		}
 	}
