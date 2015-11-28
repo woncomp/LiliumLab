@@ -3,6 +3,8 @@
     {
       "VariableValues": {
         "SSAO": "1;min=0;max=1",
+        "Shininess": "0.203;min=0;max=1",
+        "SpecularIndensity": "1;min=0;max=1",
         "Color": "1,0.6392157,0.3490196,1"
       },
       "ShaderEntry": {

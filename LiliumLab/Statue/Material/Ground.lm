@@ -3,7 +3,9 @@
     {
       "VariableValues": {
         "SSAO": "1;min=0;max=1",
-        "diffuseColor": "1,1,1,1"
+        "Shininess": "0.484;min=0;max=1",
+        "SpecularIndensity": "0;min=0;max=1",
+        "Color": "1,1,1,1"
       },
       "ShaderEntry": {
         "ShaderFile": "Light.hlsl",

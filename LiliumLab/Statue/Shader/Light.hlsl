@@ -3,6 +3,8 @@
 cbuffer data
 {
 	float SSAO = 1;
+	float Shininess = 0.5;
+	float SpecularIndensity = 1;
 	float4 Color = float4(1, 1, 1, 1);
 }
 
@@ -12,6 +14,7 @@ struct PS_IN
 	float3 normalW : NORMAL;
 	float2 texCoord : TEXCOORD;
 	float4 positionCS : POSITION1;
+	float4 positionWS : POSITION2;
 };
 
 SamplerState s;
@@ -55,7 +58,14 @@ float4 PS(PS_IN input) : SV_Target
 	l = saturate(dot(normalW, lightDir));
 	float4 diffuse = l * lightDiffuse;
 
+// specular
+	float3 reflectDirWS = reflect(-lightDir, normalW);
+	float3 eyeDirWS = normalize(eyePos - input.positionWS);
+	l = saturate(dot(reflectDirWS, eyeDirWS));
+	l = pow(l, 1 / Shininess);
+	float4 specular = float4(1, 1, 1, 1) * l * SpecularIndensity;
+
 // color
 	float4 baseMapValue = baseMap.Sample(s, input.texCoord);
-	return baseMapValue * (ambient + diffuse) * Color;
+	return baseMapValue * (ambient + diffuse) * Color + specular;
 }
