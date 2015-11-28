@@ -2,7 +2,7 @@
   "Passes": [
     {
       "ShaderEntry": {
-        "ShaderFile": "SSAOBuffer.hlsl",
+        "ShaderFile": "GBuffer.hlsl",
         "VertexShaderFunction": "VS",
         "PixelShaderFunction": "PS",
         "GeometryShaderFunction": null,

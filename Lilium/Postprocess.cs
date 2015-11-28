@@ -28,6 +28,8 @@ namespace Lilium
 
 		public string Name { get; private set; }
 
+		public MaterialPass Pass;
+
 		Game game;
 
 		RenderTexture renderTexture;
@@ -35,8 +37,9 @@ namespace Lilium
 		private string debugName;
 		private string shaderFile;
 
+		private bool active = true;
+
 		float[] vertices = new float[VERTEX_FLOAT_COUNT * VERTEX_COUNT];
-		MaterialPass pass;
 		Buffer vertexBuffer;
 		VertexBufferBinding vertexBufferBinding;
 
@@ -100,13 +103,14 @@ namespace Lilium
 		public void Draw()
 		{
 			var dc = game.DeviceContext;
+			if (!active) return;
 
 			if (renderTexture != null)
 				renderTexture.Begin();
 			else
 				dc.ClearDepthStencilView(game.DefaultDepthStencilView, DepthStencilClearFlags.Depth | DepthStencilClearFlags.Stencil, 1, 0);
 
-			pass.Apply();
+			Pass.Apply();
 			if(renderTexture != null)
 			{
 				ppData.renderTargetWidth = renderTexture.Viewport.Width;
@@ -148,7 +152,7 @@ namespace Lilium
 				new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32_Float, 0, 0),
 				new InputElement("TEXCOORD", 0, SharpDX.DXGI.Format.R32G32_Float, 12, 0),
 			};
-			pass = new MaterialPass(Game.Instance.Device, passDesc, debugName);
+			Pass = new MaterialPass(Game.Instance.Device, passDesc, debugName);
 		}
 
 		void BuildVertexBuffer()
@@ -197,7 +201,7 @@ namespace Lilium
 			{
 				Utilities.Dispose(ref samplerStates[i]);
 			}
-			Utilities.Dispose(ref pass);
+			Utilities.Dispose(ref Pass);
 			Utilities.Dispose(ref vertexBuffer);
 			Utilities.Dispose(ref ppBuffer);
 		}
@@ -211,17 +215,19 @@ namespace Lilium
 				var btnReload = new Lilium.Controls.Button("Reload", () =>
 				{
 					game.SelectedObject = null;
-					pass.Dispose();
+					Pass.Dispose();
 					LoadShader();
 					game.SelectedObject = this;
 				});
 				list.Add(btnReload);
-				if (! pass.IsValid)
+				if (! Pass.IsValid)
 				{
 					var textArea = new Lilium.Controls.TextArea();
-					textArea.Text = pass.ErrorMessage;
+					textArea.Text = Pass.ErrorMessage;
 					list.Add(textArea);
 				}
+				var toggle = new Lilium.Controls.Toggle("Active", () => active, val => active = val);
+				list.Add(toggle);
 				if(renderTexture != null)
 				{
 					var btn = new Lilium.Controls.Button("Select RenderTexture", () =>

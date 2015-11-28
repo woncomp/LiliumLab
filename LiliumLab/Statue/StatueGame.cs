@@ -15,45 +15,116 @@ namespace LiliumLab
 {
 	public class StatueGame : Game
 	{
+		struct ShadowMapData
+		{
+			public Matrix LightViewMatrix;
+			public Matrix LightProjectionMatrix;
+			public float shadowBias;
+			public Vector3 lightPosV;
+		}
+
 		const int MAX_KERNEL_SIZE = 64;
-
-		RenderTexture rtSSAOGeometry;
-		RenderTexture rtAmbientIndensity;
-		RenderTexture rtBlur;
-
-		Material materialSSAOBuffer;
-		Postprocess ppSSAO;
-
-		float[] ppSSAOData;
-		Buffer ppSSAObuffer;
-
-		Postprocess ppBlur;
 
 		Entity entityStatue;
 		Entity entityPlane;
 
-		int kernelIndex = 0;
+		// Defered
+		RenderTexture rtGBuffer;
+		ShaderResourceView gBufferPosW;
+		ShaderResourceView gBufferPosV;
+		ShaderResourceView gBufferNormalV;
+
+		Material materialGBufer;
+
+		// ShadowMapping
+		Material materialShadowMap;
+		Buffer bufferShadowMap;
+		RenderTexture rtShadowMap;
+
+		ShadowMapData shadowMapData;
+
+		Postprocess ppShadowMapping;
+
+		// SSAO
+		RenderTexture rtSSAO;
+		Postprocess ppSSAO;
+
+		RenderTexture rtBlur;
+		Postprocess ppBlur;
+
+		float[] ppSSAOData;
+		Buffer ppSSAObuffer;
+
 		Random r = new Random();
 
 		[Slider(0f, 0.5f)]
 		float SSAORadius = 0.2f;
+
+		[Slider(0f, 5f)]
+		float ShadowBias = 2;
 
 		protected override void OnStart()
 		{
 			ResourceManager.SearchPaths.Add("../../Statue/");
 			Light.MainLight.AmbientColor = new Vector4(0.5f, 0.5f, 0.5f, 1);
 			Light.MainLight.DiffuseColor = new Vector4(0.5f, 0.5f, 0.5f, 1);
+			Light.MainLight.LightDistance = 30;
 
-			rtSSAOGeometry = new RenderTexture(this, 2);
-			AutoDispose(rtSSAOGeometry);
+			// GBuffer
+			rtGBuffer = new RenderTexture(this, 3, "GBuffers");
+			AutoDispose(rtGBuffer);
+			var gBuffers = rtGBuffer.GetShaderResourceViews();
+			gBufferPosW = gBuffers[0];
+			gBufferPosV = gBuffers[1];
+			gBufferNormalV = gBuffers[2];
 
-			rtAmbientIndensity = new RenderTexture(this);
-			AutoDispose(rtAmbientIndensity);
+			materialGBufer = ResourceManager.Material.Load("GBuffer.lm");
 
-			rtBlur = new RenderTexture(this);
+			// ShadowMap
+			materialShadowMap = ResourceManager.Material.Load("ShadowMap.lm");
+			bufferShadowMap = Material.CreateBuffer<ShadowMapData>();
+			AutoDispose(bufferShadowMap);
+			rtShadowMap = new RenderTexture(this, 1024, 1024, 1, "ShadowMap");
+			AutoDispose(rtShadowMap);
+
+			ppShadowMapping = new Postprocess(this, "Shadow.hlsl");
+			AutoDispose(ppShadowMapping);
+			{
+				var views = new ShaderResourceView[4];
+				views[0] = gBufferPosW;
+				views[1] = rtShadowMap.ShaderResourceView;
+				views[2] = gBufferNormalV;
+				views[3] = gBufferPosV;
+				ppShadowMapping.SetShaderResourceViews(views);
+
+				var desc = SamplerStateDescription.Default();
+				desc.Filter = Filter.MinMagMipLinear;
+				ppShadowMapping.SetSamplerState(0, desc);
+				ppShadowMapping.SetSamplerState(1, desc);
+				ppShadowMapping.SetSamplerState(2, desc);
+				ppShadowMapping.SetSamplerState(3, desc);
+			}
+			{
+				var desc = BlendStateDescription.Default();
+				desc.RenderTarget[0].IsBlendEnabled = true;
+				desc.RenderTarget[0].SourceBlend = BlendOption.SourceAlpha;
+				desc.RenderTarget[0].DestinationBlend = BlendOption.InverseSourceAlpha;
+				desc.RenderTarget[0].BlendOperation = BlendOperation.Add;
+				desc.RenderTarget[0].SourceAlphaBlend = BlendOption.One;
+				desc.RenderTarget[0].DestinationAlphaBlend = BlendOption.Zero;
+				desc.RenderTarget[0].BlendOperation = BlendOperation.Add;
+				desc.RenderTarget[0].RenderTargetWriteMask = ColorWriteMaskFlags.All;
+
+				ppShadowMapping.Pass.BlendState.Dispose();
+				ppShadowMapping.Pass.BlendState = new BlendState(Device, desc);
+			}
+
+			// SSAO
+			rtSSAO = new RenderTexture(this, 1, "SSAO");
+			AutoDispose(rtSSAO);
+
+			rtBlur = new RenderTexture(this, 1, "Blur");
 			AutoDispose(rtBlur);
-
-			materialSSAOBuffer = ResourceManager.Material.Load("SSAOBuffer.lm");
 
 			CreateSSAOPass();
 
@@ -63,7 +134,7 @@ namespace LiliumLab
 
 			ppBlur = new Postprocess(this, "SSAOBlur.hlsl", rtBlur);
 			AutoDispose(ppBlur);
-			ppBlur.SetShaderResourceViews(rtAmbientIndensity.GetShaderResourceViews());
+			ppBlur.SetShaderResourceViews(rtSSAO.GetShaderResourceViews());
 
 			entityStatue = new Entity("knight_statue.obj");
 			entityStatue.Position = new Vector3(0, -0.33f, 0);
@@ -106,10 +177,11 @@ namespace LiliumLab
 
 		void CreateSSAOPass()
 		{
-			ppSSAO = new Postprocess(this, "SSAOPostprocess.hlsl", rtAmbientIndensity);
+			ppSSAO = new Postprocess(this, "SSAOPostprocess.hlsl", rtSSAO);
 			AutoDispose(ppSSAO);
-			var views = rtSSAOGeometry.GetShaderResourceViews();
-			Array.Resize(ref views, 3);
+			var views = new ShaderResourceView[3];
+			views[0] = gBufferPosV;
+			views[1] = gBufferNormalV;
 			views[2] = ResourceManager.Tex2D.Load("kernel_rotation.png");
 			ppSSAO.SetShaderResourceViews(views);
 
@@ -144,11 +216,31 @@ namespace LiliumLab
 
 		protected override void OnUpdate()
 		{
-			rtSSAOGeometry.Begin();
-			entityStatue.DrawWithMaterial(materialSSAOBuffer);
-			entityPlane.DrawWithMaterial(materialSSAOBuffer);
-			rtSSAOGeometry.End();
+			// Update light matrices;
+			{
+				var light = Light.MainLight;
+				shadowMapData.LightViewMatrix = Matrix.LookAtLH(light.LightPos, light.LightPos - light.LightDirection, Vector3.Up);
+				//shadowMapData.LightProjectionMatrix = Matrix.PerspectiveFovLH(MathUtil.PiOverTwo, 1, 0.01f, 1000);
+				shadowMapData.LightProjectionMatrix = Matrix.OrthoLH(50, 50, 0.01f, 100);
+				shadowMapData.shadowBias = (float)Math.Pow(0.1, ShadowBias);
+				shadowMapData.lightPosV = Vector3.TransformCoordinate(light.LightPos, Camera.ActiveCamera.ViewMatrix);
+			}
 
+			// Render G-Buffers
+			rtGBuffer.Begin();
+			entityStatue.DrawWithMaterial(materialGBufer);
+			entityPlane.DrawWithMaterial(materialGBufer);
+			rtGBuffer.End();
+
+			// Render shadow map
+			rtShadowMap.Begin();
+			DeviceContext.UpdateSubresource(ref shadowMapData, bufferShadowMap);
+			DeviceContext.VertexShader.SetConstantBuffer(0, bufferShadowMap);
+			entityPlane.DrawWithMaterial(materialShadowMap);
+			entityStatue.DrawWithMaterial(materialShadowMap);
+			rtShadowMap.End();
+
+			// Render SSAO map
 			ppSSAOData[0] = SSAORadius;
 			float[] proj = Camera.ActiveCamera.ProjectionMatrix.ToArray();
 			Array.Copy(proj, 0, ppSSAOData, 4, 16);
@@ -156,12 +248,18 @@ namespace LiliumLab
 			DeviceContext.PixelShader.SetConstantBuffer(0, ppSSAObuffer);
 			ppSSAO.Draw();
 
+			// Blur SSAO map
 			ppBlur.Draw();
 
+			// Draw Scene with SSAO
 			entityStatue.SubmeshMaterials[0].Passes[0].TextureList[1] = rtBlur.ShaderResourceView;
 			entityStatue.Draw();
 			entityPlane.SubmeshMaterials[0].Passes[0].TextureList[1] = rtBlur.ShaderResourceView;
 			entityPlane.Draw();
+
+			// Draw Shadow
+			DeviceContext.PixelShader.SetConstantBuffer(0, bufferShadowMap);
+			ppShadowMapping.Draw();
 		}
 	}
 }

@@ -569,7 +569,7 @@ namespace Lilium
 			{
 				var constantBuffer = r.GetConstantBuffer(i);
 				var name = constantBuffer.Description.Name;
-				if (name == "LiliumPerFrame" || name == "LiliumPerObject") continue;
+				if (name == "LiliumPerFrame" || name == "LiliumPerObject" || name.StartsWith("_")) continue;
 				if (autoConstantBuffers.Exists(b => b.Name == name)) continue;
 
 				var acb = new MaterialConstantBuffer();
