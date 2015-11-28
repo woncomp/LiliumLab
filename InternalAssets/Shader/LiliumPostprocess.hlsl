@@ -1,3 +1,9 @@
+cbuffer Lilium : register(b7)
+{
+	float renderTargetWidth;
+	float renderTargetHeight;
+};
+
 struct VS_IN
 {
 	float4 position : POSITION;

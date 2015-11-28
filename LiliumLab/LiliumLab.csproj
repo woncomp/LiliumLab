@@ -57,6 +57,7 @@
       <HintPath>..\Library\SharpDX.DXGI.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Windows.Forms" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Lilium\Lilium.csproj">

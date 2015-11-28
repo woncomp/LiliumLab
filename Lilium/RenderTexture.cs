@@ -37,7 +37,7 @@ namespace Lilium
 		string debugName;
 		Game game;
 
-		private TexturePreview texturePreview;//MTBTODO
+		private TexturePreview texturePreview;
 		private int previewIndex = 0;
 
 		public RenderTexture(Game game, int mrtCount = 1, string debugName = null)

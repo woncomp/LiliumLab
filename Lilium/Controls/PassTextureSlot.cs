@@ -57,7 +57,23 @@ namespace Lilium.Controls
 
 			var filePath = game.ResourceManager.FindValidResourceFilePath(pass.Desc.Textures[textureIndex].TextureFile, game.ResourceManager.Tex2D.SubfolderName);
 			if (System.IO.File.Exists(filePath))
-				pictureBox1.Image = new Bitmap(filePath);
+			{
+				if (filePath.EndsWith(".dds"))
+				{
+					pictureBox1.Image = null;
+				}
+				else
+				{
+					try
+					{
+						pictureBox1.Image = new Bitmap(filePath);
+					}
+					catch (Exception e)
+					{
+						Debug.Log(e.Message);
+					}
+				}
+			}
 			else
 				pictureBox1.Image = null;
 

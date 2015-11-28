@@ -12,8 +12,15 @@ using Buffer = SharpDX.Direct3D11.Buffer;
 
 namespace Lilium
 {
-	public class Postprocess : IDisposable
+	public class Postprocess : IDisposable, ISelectable
 	{
+		struct LiliumPostprocessData
+		{
+			public float renderTargetWidth;
+			public float renderTargetHeight;
+			public Vector2 ___;
+		}
+
 		const int VERTEX_FLOAT_COUNT = 5;
 		const int VERTEX_COUNT = 6;
 
@@ -25,10 +32,16 @@ namespace Lilium
 
 		RenderTexture renderTexture;
 
+		private string debugName;
+		private string shaderFile;
+
 		float[] vertices = new float[VERTEX_FLOAT_COUNT * VERTEX_COUNT];
 		MaterialPass pass;
 		Buffer vertexBuffer;
 		VertexBufferBinding vertexBufferBinding;
+
+		Buffer ppBuffer;
+		LiliumPostprocessData ppData;
 
 		SamplerState[] samplerStates = new SamplerState[0];
 		ShaderResourceView[] shaderResourceViews = new ShaderResourceView[0];
@@ -38,22 +51,26 @@ namespace Lilium
 		{
 			this.game = game;
 			this.renderTexture = rt;
-			this.Name = name ?? "Postprocess " + Debug.NextObjectId;
+			if(name == null)
+			{
+				this.Name = System.IO.Path.GetFileNameWithoutExtension(shaderFile);
+				this.debugName = "Postprocess " + this.Name;
+			}
+			else
+			{
+				this.debugName = this.Name = name;
+			}
+			this.shaderFile = shaderFile;
 
 			var desc = SamplerStateDescription.Default();
 			desc.Filter = Filter.MinMagMipPoint;
 			defaultSamplerStateDescription = desc;
 
-			var passDesc = new MaterialPassDesc();
-			passDesc.ManualConstantBuffers = true;
-			passDesc.ShaderFile = shaderFile;
-			passDesc.InputElements = new InputElement[]{
-				new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32_Float, 0, 0),
-				new InputElement("TEXCOORD", 0, SharpDX.DXGI.Format.R32G32_Float, 12, 0),
-			};
-			pass = new MaterialPass(Game.Instance.Device, passDesc, Name);
-
+			LoadShader();
 			BuildVertexBuffer();
+			ppBuffer = Material.CreateBuffer<LiliumPostprocessData>();
+
+			game.AddObject(this);
 		}
 
 		public void SetShaderResourceViews(ShaderResourceView[] shaderResourceViews)
@@ -71,6 +88,15 @@ namespace Lilium
 			}
 		}
 
+		public void SetSamplerState(int index, SamplerStateDescription desc)
+		{
+			if (index >= 0 && index < samplerStates.Length)
+			{
+				Utilities.Dispose(ref samplerStates[index]);
+				samplerStates[index] = new SamplerState(game.Device, desc);
+			}
+		}
+
 		public void Draw()
 		{
 			var dc = game.DeviceContext;
@@ -81,6 +107,19 @@ namespace Lilium
 				dc.ClearDepthStencilView(game.DefaultDepthStencilView, DepthStencilClearFlags.Depth | DepthStencilClearFlags.Stencil, 1, 0);
 
 			pass.Apply();
+			if(renderTexture != null)
+			{
+				ppData.renderTargetWidth = renderTexture.Viewport.Width;
+				ppData.renderTargetHeight = renderTexture.Viewport.Height;
+			}
+			else
+			{
+				ppData.renderTargetWidth = game.DefaultViewport.Width;
+				ppData.renderTargetHeight = game.DefaultViewport.Height;
+			}
+			ppData.___ = Vector2.Zero;
+			dc.UpdateSubresource(ref ppData, ppBuffer);
+			dc.PixelShader.SetConstantBuffer(7, ppBuffer);
 
 			dc.InputAssembler.PrimitiveTopology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
 			dc.InputAssembler.SetVertexBuffers(0, vertexBufferBinding);
@@ -98,6 +137,18 @@ namespace Lilium
 
 			if(renderTexture != null)
 				renderTexture.End();
+		}
+
+		void LoadShader()
+		{
+			var passDesc = new MaterialPassDesc();
+			passDesc.ManualConstantBuffers = true;
+			passDesc.ShaderFile = shaderFile;
+			passDesc.InputElements = new InputElement[]{
+				new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32_Float, 0, 0),
+				new InputElement("TEXCOORD", 0, SharpDX.DXGI.Format.R32G32_Float, 12, 0),
+			};
+			pass = new MaterialPass(Game.Instance.Device, passDesc, debugName);
 		}
 
 		void BuildVertexBuffer()
@@ -125,7 +176,7 @@ namespace Lilium
 			desc.OptionFlags = ResourceOptionFlags.None;
 
 			vertexBuffer = Buffer.Create(game.Device, vertices, desc);
-			vertexBuffer.DebugName = Name;
+			vertexBuffer.DebugName = debugName;
 
 			vertexBufferBinding = new VertexBufferBinding(vertexBuffer, Utilities.SizeOf<float>() * VERTEX_FLOAT_COUNT, 0);
 		}
@@ -148,8 +199,45 @@ namespace Lilium
 			}
 			Utilities.Dispose(ref pass);
 			Utilities.Dispose(ref vertexBuffer);
-			//Utilities.Dispose(ref shaderResourceView);
-			//shaderResourceView = null;
+			Utilities.Dispose(ref ppBuffer);
 		}
+
+		#region Selectable
+		public Controls.Control[] Controls
+		{
+			get
+			{
+				var list = new List<Lilium.Controls.Control>();
+				var btnReload = new Lilium.Controls.Button("Reload", () =>
+				{
+					game.SelectedObject = null;
+					pass.Dispose();
+					LoadShader();
+					game.SelectedObject = this;
+				});
+				list.Add(btnReload);
+				if (! pass.IsValid)
+				{
+					var textArea = new Lilium.Controls.TextArea();
+					textArea.Text = pass.ErrorMessage;
+					list.Add(textArea);
+				}
+				if(renderTexture != null)
+				{
+					var btn = new Lilium.Controls.Button("Select RenderTexture", () =>
+					{
+						game.SelectedObject = renderTexture;
+					});
+					list.Add(btn);
+				}
+				return list.ToArray();
+			}
+		}
+
+		public string NameInObjectList
+		{
+			get { return Name; }
+		}
+		#endregion
 	}
 }
