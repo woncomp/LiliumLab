@@ -139,6 +139,8 @@ namespace Lilium
 				dc.PixelShader.SetShaderResources(0, shaderResourceViewsClear);
 			}
 
+			Pass.Clear();
+
 			if(renderTexture != null)
 				renderTexture.End();
 		}

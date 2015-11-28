@@ -339,32 +339,32 @@ namespace Lilium
 
 				var signature = ShaderSignature.GetInputSignature(vertexShaderByteCode);
 				Layout = new InputLayout(Device, signature, desc.InputElements);
-
-				RasterizerState = new RasterizerState(Device, desc.RasteriazerStates);
-				BlendState = new BlendState(Device, desc.BlendStates);
-				DepthStencilState = new DepthStencilState(Device, desc.DepthStencilStates);
-
-				TextureList = new ShaderResourceView[desc.Textures.Length];
-				SamplerStateList = new SamplerState[desc.Textures.Length];
-				for (int i = 0; i < desc.Textures.Length; ++i)
-				{
-					var t = desc.Textures[i];
-					if (string.IsNullOrEmpty(t.TextureFile))
-					{
-						TextureList[i] = null;
-						SamplerStateList[i] = null;
-					}
-					else
-					{
-						TextureList[i] = Game.Instance.ResourceManager.Tex2D.Load(t.TextureFile);
-						SamplerStateList[i] = new SamplerState(Device, t.SamplerStates);
-					}
-				}
 			}
 			catch (SharpDX.CompilationException e)
 			{
 				IsValid = false;
 				ErrorMessage = e.Message;
+			}
+
+			RasterizerState = new RasterizerState(Device, desc.RasteriazerStates);
+			BlendState = new BlendState(Device, desc.BlendStates);
+			DepthStencilState = new DepthStencilState(Device, desc.DepthStencilStates);
+
+			TextureList = new ShaderResourceView[desc.Textures.Length];
+			SamplerStateList = new SamplerState[desc.Textures.Length];
+			for (int i = 0; i < desc.Textures.Length; ++i)
+			{
+				var t = desc.Textures[i];
+				if (string.IsNullOrEmpty(t.TextureFile))
+				{
+					TextureList[i] = null;
+					SamplerStateList[i] = null;
+				}
+				else
+				{
+					TextureList[i] = Game.Instance.ResourceManager.Tex2D.Load(t.TextureFile);
+					SamplerStateList[i] = new SamplerState(Device, t.SamplerStates);
+				}
 			}
 		}
 

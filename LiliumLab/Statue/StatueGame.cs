@@ -19,11 +19,14 @@ namespace LiliumLab
 		{
 			public Matrix LightViewMatrix;
 			public Matrix LightProjectionMatrix;
-			public float shadowBias;
-			public Vector3 lightPosV;
+			public float ShadowBias;
+			public Vector3 LightPosV;
+			public int ShadowMapSize;
+			public Vector3 ___;
 		}
 
 		const int MAX_KERNEL_SIZE = 64;
+		const int SHADOW_MAP_SIZE = 1024;
 
 		Entity entityStatue;
 		Entity entityPlane;
@@ -61,7 +64,7 @@ namespace LiliumLab
 		float SSAORadius = 0.2f;
 
 		[Slider(0f, 5f)]
-		float ShadowBias = 2;
+		float ShadowBias = 3;
 
 		protected override void OnStart()
 		{
@@ -84,7 +87,7 @@ namespace LiliumLab
 			materialShadowMap = ResourceManager.Material.Load("ShadowMap.lm");
 			bufferShadowMap = Material.CreateBuffer<ShadowMapData>();
 			AutoDispose(bufferShadowMap);
-			rtShadowMap = new RenderTexture(this, 1024, 1024, 1, "ShadowMap");
+			rtShadowMap = new RenderTexture(this, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 1, "ShadowMap");
 			AutoDispose(rtShadowMap);
 
 			ppShadowMapping = new Postprocess(this, "Shadow.hlsl");
@@ -222,8 +225,10 @@ namespace LiliumLab
 				shadowMapData.LightViewMatrix = Matrix.LookAtLH(light.LightPos, light.LightPos - light.LightDirection, Vector3.Up);
 				//shadowMapData.LightProjectionMatrix = Matrix.PerspectiveFovLH(MathUtil.PiOverTwo, 1, 0.01f, 1000);
 				shadowMapData.LightProjectionMatrix = Matrix.OrthoLH(50, 50, 0.01f, 100);
-				shadowMapData.shadowBias = (float)Math.Pow(0.1, ShadowBias);
-				shadowMapData.lightPosV = Vector3.TransformCoordinate(light.LightPos, Camera.ActiveCamera.ViewMatrix);
+				shadowMapData.ShadowBias = (float)Math.Pow(0.1, ShadowBias);
+				shadowMapData.LightPosV = Vector3.TransformCoordinate(light.LightPos, Camera.ActiveCamera.ViewMatrix);
+				shadowMapData.ShadowMapSize = SHADOW_MAP_SIZE;
+				shadowMapData.___ = Vector3.Zero;
 			}
 
 			// Render G-Buffers

@@ -28,14 +28,14 @@ PS_IN VS(VS_IN input)
 	//output.normalW = mul(matWorldInverseTranspose, input.normal);
 	//output.texCoord = input.texCoord;
 
-	output.positionLCS = output.position;// / output.position.w;
+	output.positionLCS = output.position / output.position.w;
 
 	return output;
 }
 
 float4 PS(PS_IN input) : SV_Target
 {
-	float d = input.positionLCS.z * 10;
+	float d = input.positionLCS.z;
 
 	return float4(d, d, d, 1);
 }

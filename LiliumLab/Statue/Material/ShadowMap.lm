@@ -1,6 +1,7 @@
 {
   "Passes": [
     {
+      "VariableValues": {},
       "ShaderEntry": {
         "ShaderFile": "ShadowMap.hlsl",
         "VertexShaderFunction": "VS",
@@ -166,8 +167,7 @@
           "Slot": 0
         }
       ],
-      "Textures": [
-      ]
+      "Textures": []
     }
   ]
 }
