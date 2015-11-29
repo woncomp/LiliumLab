@@ -20,6 +20,7 @@ struct PS_IN
 SamplerState s;
 Texture2D baseMap : register(t0);
 Texture2D ssaoMap : register(t1);
+Texture2D shadowMap : register(t2);
 
 PS_IN VS(VS_IN input)
 {
@@ -43,12 +44,15 @@ PS_IN VS(VS_IN input)
 float4 PS(PS_IN input) : SV_Target
 {
 	float l;
-
-// ambient
 	float2 texCoordScreenSpace = input.positionCS.xy / input.positionCS.w;
 	texCoordScreenSpace.x = 0.5 + 0.5*texCoordScreenSpace.x;
 	texCoordScreenSpace.y = 0.5 - 0.5*texCoordScreenSpace.y;
-	float ambientIndensity = ssaoMap.Sample(s, texCoordScreenSpace);
+
+// shadow 
+	float shadow = shadowMap.Sample(s, texCoordScreenSpace).x;
+
+// ambient
+	float ambientIndensity = ssaoMap.Sample(s, texCoordScreenSpace).x;
 	ambientIndensity = lerp(1, ambientIndensity, SSAO);
 	float4 ambient = lightAmbient * ambientIndensity;
 
@@ -56,6 +60,7 @@ float4 PS(PS_IN input) : SV_Target
 	float3 normalW = normalize(input.normalW);
 
 	l = saturate(dot(normalW, lightDir));
+	l = min(shadow, l);
 	float4 diffuse = l * lightDiffuse;
 
 // specular
@@ -63,7 +68,7 @@ float4 PS(PS_IN input) : SV_Target
 	float3 eyeDirWS = normalize(eyePos - input.positionWS);
 	l = saturate(dot(reflectDirWS, eyeDirWS));
 	l = pow(l, 1 / Shininess);
-	float4 specular = float4(1, 1, 1, 1) * l * SpecularIndensity;
+	float4 specular = shadow * float4(1, 1, 1, 1) * l * SpecularIndensity;
 
 // color
 	float4 baseMapValue = baseMap.Sample(s, input.texCoord);

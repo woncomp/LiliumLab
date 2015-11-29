@@ -286,6 +286,7 @@ namespace Lilium
 		public string ErrorMessage { get; private set; }
 
 		private string debugName;
+		private List<ShaderResourceBinding> shaderResourceBindings = new List<ShaderResourceBinding>();
 
 		public MaterialPass(Device device, MaterialPassDesc desc, string debugName = null)
 		{
@@ -385,6 +386,15 @@ namespace Lilium
 			DeviceContext.PixelShader.SetSamplers(0, SamplerStateList);
 			DeviceContext.PixelShader.SetShaderResources(0, TextureList);
 
+			for(int i=0;i<shaderResourceBindings.Count;++i)
+			{
+				var b = shaderResourceBindings[i];
+				if(b != null)
+				{
+					DeviceContext.PixelShader.SetSampler(b.Slot, b.Sampler);
+					DeviceContext.PixelShader.SetShaderResource(b.Slot, b.Res);
+				}
+			}
 		}
 
 		public void UpdateConstantBuffers()
@@ -407,10 +417,37 @@ namespace Lilium
 			DeviceContext.OutputMerger.BlendState = Game.Instance.DefaultBlendState;
 			DeviceContext.OutputMerger.SetDepthStencilState(null);
 
-			for (int i = 0; i < TextureList.Length; ++i)
+			for (int i = 0; i < TextureList.Length || i < shaderResourceBindings.Count; ++i)
 			{
 				DeviceContext.PixelShader.SetSampler(i, null);
 				DeviceContext.PixelShader.SetShaderResource(i, null);
+			}
+		}
+
+		public void BindShaderResource(int slot, ShaderResourceView shaderResourceView)
+		{
+			BindShaderResource(slot, shaderResourceView, SamplerStateDescription.Default());
+		}
+
+		public void BindShaderResource(int slot, ShaderResourceView shaderResourceView, SamplerStateDescription desc)
+		{
+			while (shaderResourceBindings.Count <= slot) shaderResourceBindings.Add(null);
+			if(shaderResourceBindings[slot] != null)
+			{
+				Utilities.Dispose(ref shaderResourceBindings[slot].Sampler);
+			}
+			if(shaderResourceView == null)
+			{
+				shaderResourceBindings[slot] = null;
+			}
+			else
+			{
+				shaderResourceBindings[slot] = new ShaderResourceBinding()
+				{
+					Slot = slot,
+					Res = shaderResourceView,
+					Sampler = new SamplerState(Device, desc),
+				};
 			}
 		}
 
@@ -462,6 +499,12 @@ namespace Lilium
 
 		public void Dispose()
 		{
+			for (int i = 0; i < shaderResourceBindings.Count; ++i)
+			{
+				var b = shaderResourceBindings[i];
+				if (b != null) b.Sampler.Dispose();
+			}
+
 			for (int i = 0; i < autoConstantBuffers.Count; ++i)
 			{
 				autoConstantBuffers[i].Dispose();
@@ -654,5 +697,12 @@ namespace Lilium
 			}
 		}
 		#endregion
+	
+		class ShaderResourceBinding
+		{
+			public int Slot;
+			public ShaderResourceView Res;
+			public SamplerState Sampler;
+		}
 	}
 }

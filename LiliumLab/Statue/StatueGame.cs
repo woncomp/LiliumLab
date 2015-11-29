@@ -46,6 +46,7 @@ namespace LiliumLab
 
 		ShadowMapData shadowMapData;
 
+		RenderTexture rtShadow;
 		Postprocess ppShadowMapping;
 
 		// SSAO
@@ -90,7 +91,10 @@ namespace LiliumLab
 			rtShadowMap = new RenderTexture(this, SHADOW_MAP_SIZE, SHADOW_MAP_SIZE, 1, "ShadowMap");
 			AutoDispose(rtShadowMap);
 
-			ppShadowMapping = new Postprocess(this, "Shadow.hlsl");
+			rtShadow = new RenderTexture(this, 1, "Shadow");
+			AutoDispose(rtShadow);
+
+			ppShadowMapping = new Postprocess(this, "Shadow.hlsl", rtShadow);
 			AutoDispose(ppShadowMapping);
 			{
 				var views = new ShaderResourceView[4];
@@ -107,20 +111,20 @@ namespace LiliumLab
 				ppShadowMapping.SetSamplerState(2, desc);
 				ppShadowMapping.SetSamplerState(3, desc);
 			}
-			{
-				var desc = BlendStateDescription.Default();
-				desc.RenderTarget[0].IsBlendEnabled = true;
-				desc.RenderTarget[0].SourceBlend = BlendOption.SourceAlpha;
-				desc.RenderTarget[0].DestinationBlend = BlendOption.InverseSourceAlpha;
-				desc.RenderTarget[0].BlendOperation = BlendOperation.Add;
-				desc.RenderTarget[0].SourceAlphaBlend = BlendOption.One;
-				desc.RenderTarget[0].DestinationAlphaBlend = BlendOption.Zero;
-				desc.RenderTarget[0].BlendOperation = BlendOperation.Add;
-				desc.RenderTarget[0].RenderTargetWriteMask = ColorWriteMaskFlags.All;
+			//{
+			//	var desc = BlendStateDescription.Default();
+			//	desc.RenderTarget[0].IsBlendEnabled = true;
+			//	desc.RenderTarget[0].SourceBlend = BlendOption.SourceAlpha;
+			//	desc.RenderTarget[0].DestinationBlend = BlendOption.InverseSourceAlpha;
+			//	desc.RenderTarget[0].BlendOperation = BlendOperation.Add;
+			//	desc.RenderTarget[0].SourceAlphaBlend = BlendOption.One;
+			//	desc.RenderTarget[0].DestinationAlphaBlend = BlendOption.Zero;
+			//	desc.RenderTarget[0].BlendOperation = BlendOperation.Add;
+			//	desc.RenderTarget[0].RenderTargetWriteMask = ColorWriteMaskFlags.All;
 
-				ppShadowMapping.Pass.BlendState.Dispose();
-				ppShadowMapping.Pass.BlendState = new BlendState(Device, desc);
-			}
+			//	ppShadowMapping.Pass.BlendState.Dispose();
+			//	ppShadowMapping.Pass.BlendState = new BlendState(Device, desc);
+			//}
 
 			// SSAO
 			rtSSAO = new RenderTexture(this, 1, "SSAO");
@@ -148,6 +152,8 @@ namespace LiliumLab
 			{
 				entityStatue.SetMaterial(i, "Statue.lm");
 			}
+			entityStatue.SubmeshMaterials[0].Passes[0].BindShaderResource(1, rtBlur.ShaderResourceView);
+			entityStatue.SubmeshMaterials[0].Passes[0].BindShaderResource(2, rtShadow.ShaderResourceView);
 
 			entityPlane = new Entity(InternalResources.MESH_PLANE);
 			entityPlane.Scale = new Vector3(2, 2, 2);
@@ -158,6 +164,8 @@ namespace LiliumLab
 			{
 				entityPlane.SetMaterial(i, "Ground.lm");
 			}
+			entityPlane.SubmeshMaterials[0].Passes[0].BindShaderResource(1, rtBlur.ShaderResourceView);
+			entityPlane.SubmeshMaterials[0].Passes[0].BindShaderResource(2, rtShadow.ShaderResourceView);
 
 			//this.AddControl(new Lilium.Controls.Button("Next Kernel", () =>
 			//{
@@ -245,6 +253,10 @@ namespace LiliumLab
 			entityStatue.DrawWithMaterial(materialShadowMap);
 			rtShadowMap.End();
 
+			// Render Shadow
+			DeviceContext.PixelShader.SetConstantBuffer(0, bufferShadowMap);
+			ppShadowMapping.Draw();
+
 			// Render SSAO map
 			ppSSAOData[0] = SSAORadius;
 			float[] proj = Camera.ActiveCamera.ProjectionMatrix.ToArray();
@@ -257,14 +269,8 @@ namespace LiliumLab
 			ppBlur.Draw();
 
 			// Draw Scene with SSAO
-			entityStatue.SubmeshMaterials[0].Passes[0].TextureList[1] = rtBlur.ShaderResourceView;
 			entityStatue.Draw();
-			entityPlane.SubmeshMaterials[0].Passes[0].TextureList[1] = rtBlur.ShaderResourceView;
 			entityPlane.Draw();
-
-			// Draw Shadow
-			DeviceContext.PixelShader.SetConstantBuffer(0, bufferShadowMap);
-			ppShadowMapping.Draw();
 		}
 	}
 }

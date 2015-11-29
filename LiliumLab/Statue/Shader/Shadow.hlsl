@@ -43,16 +43,16 @@ float4 PS(PS_IN input) : SV_Target
 		float shadowDepth = texShadow.Sample(s, texCoord).x;
 		float fragmentDepth = posLCS.z / posLCS.w;
 
-		c += (shadowDepth + ShadowBias > fragmentDepth) ? 0 : 0.5;
+		c += (shadowDepth + ShadowBias > fragmentDepth) ? 0 : 1;
 	}
-	c /= 9.0;
+	c = 1 - c / 9.0;
 
-	float3 normalVS = texNormalV.Sample(s, input.texCoord).xyz * 2 - 1;
-	float3 posVS = texPosV.Sample(s, input.texCoord).xyz;
-	float3 lightDirVS = normalize(LightPosV - posVS);
+	// float3 normalVS = texNormalV.Sample(s, input.texCoord).xyz * 2 - 1;
+	// float3 posVS = texPosV.Sample(s, input.texCoord).xyz;
+	// float3 lightDirVS = normalize(LightPosV - posVS);
 
-	float backLight = dot(lightDirVS, normalVS);
-	if(backLight < 0) c = 0.5;
+	// float backLight = dot(lightDirVS, normalVS);
+	// if(backLight < 0) c = 0.5;
 
-	return float4(0, 0, 0, c);
+	return float4(c, c, c, 1);
 }
