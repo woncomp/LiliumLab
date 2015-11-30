@@ -26,6 +26,7 @@ namespace Lilium
 			InitializeComponent();
 
 			this.game = game;
+			this.Text = game.GetType().Name;
 		}
 
 		public void AddObject(ISelectable obj)

@@ -252,6 +252,13 @@ namespace Lilium
 					list.Add(new Lilium.Controls.Label("XXXXXX", () => "Pass Error !!!"));
 				}
 			}
+			list.Add(new Lilium.Controls.Button("Add Pass", () =>
+			{
+				Desc.Passes.Add(Desc.Passes[Desc.Passes.Count - 1]);
+				Game.Instance.SelectedObject = null;
+				Reload();
+				Game.Instance.SelectedObject = this;
+			}));
 			controls = list.ToArray();
 		}
 
