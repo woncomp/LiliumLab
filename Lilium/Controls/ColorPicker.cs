@@ -16,7 +16,6 @@ namespace Lilium.Controls
 {
 	public partial class ColorPicker : Control
 	{
-		//Vector4 colorValue;
 		Vector4 colorValue;
 		Vector4 oldColorValue;
 		int alpha;
@@ -34,6 +33,7 @@ namespace Lilium.Controls
 			labelTitle.Text = title;
 			_get = get;
 			_set = set;
+			colorValue.X = 999;
 		}
 		
 		public override void UpdateData()

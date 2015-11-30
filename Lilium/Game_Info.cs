@@ -111,6 +111,7 @@ namespace Lilium
 
 		public void AddControl(Control control)
 		{
+			control.UpdateData();
 			infoControls.Add(control);
 			MainForm.Instance.InfoContainer.Controls.Add(control);
 		}
