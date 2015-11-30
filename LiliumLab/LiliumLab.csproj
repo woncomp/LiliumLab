@@ -43,6 +43,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Test\TestGame.cs" />
     <Compile Include="Toon\ToonGame.cs" />
+    <Compile Include="Weiss\WeissGame.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="SharpDX, Version=2.5.0.0, Culture=neutral, processorArchitecture=MSIL">

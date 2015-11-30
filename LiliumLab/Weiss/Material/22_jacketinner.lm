@@ -1,0 +1,407 @@
+{
+  "Passes": [
+    {
+      "VariableValues": {
+        "OutlineColor": "0,0,0,0",
+        "OutlineThickness": "0.74;min=0;max=5"
+      },
+      "ShaderEntry": {
+        "ShaderFile": "Outline.hlsl",
+        "VertexShaderFunction": "VS",
+        "PixelShaderFunction": "PS",
+        "GeometryShaderFunction": null,
+        "HullShaderFunction": null,
+        "DomainShaderFunction": null
+      },
+      "RasterizerStates": {
+        "CullMode": 2,
+        "DepthBias": 0,
+        "DepthBiasClamp": 0.0,
+        "FillMode": 3,
+        "IsAntialiasedLineEnabled": false,
+        "IsDepthClipEnabled": true,
+        "IsFrontCounterClockwise": false,
+        "IsMultisampleEnabled": false,
+        "IsScissorEnabled": false,
+        "SlopeScaledDepthBias": 0.0
+      },
+      "BlendStates": {
+        "AlphaToCoverageEnable": false,
+        "IndependentBlendEnable": false,
+        "RenderTarget": [
+          {
+            "AlphaBlendOperation": 1,
+            "BlendOperation": 1,
+            "DestinationAlphaBlend": 1,
+            "DestinationBlend": 1,
+            "IsBlendEnabled": false,
+            "RenderTargetWriteMask": 15,
+            "SourceAlphaBlend": 2,
+            "SourceBlend": 2
+          },
+          {
+            "AlphaBlendOperation": 1,
+            "BlendOperation": 1,
+            "DestinationAlphaBlend": 1,
+            "DestinationBlend": 1,
+            "IsBlendEnabled": false,
+            "RenderTargetWriteMask": 15,
+            "SourceAlphaBlend": 2,
+            "SourceBlend": 2
+          },
+          {
+            "AlphaBlendOperation": 1,
+            "BlendOperation": 1,
+            "DestinationAlphaBlend": 1,
+            "DestinationBlend": 1,
+            "IsBlendEnabled": false,
+            "RenderTargetWriteMask": 15,
+            "SourceAlphaBlend": 2,
+            "SourceBlend": 2
+          },
+          {
+            "AlphaBlendOperation": 1,
+            "BlendOperation": 1,
+            "DestinationAlphaBlend": 1,
+            "DestinationBlend": 1,
+            "IsBlendEnabled": false,
+            "RenderTargetWriteMask": 15,
+            "SourceAlphaBlend": 2,
+            "SourceBlend": 2
+          },
+          {
+            "AlphaBlendOperation": 1,
+            "BlendOperation": 1,
+            "DestinationAlphaBlend": 1,
+            "DestinationBlend": 1,
+            "IsBlendEnabled": false,
+            "RenderTargetWriteMask": 15,
+            "SourceAlphaBlend": 2,
+            "SourceBlend": 2
+          },
+          {
+            "AlphaBlendOperation": 1,
+            "BlendOperation": 1,
+            "DestinationAlphaBlend": 1,
+            "DestinationBlend": 1,
+            "IsBlendEnabled": false,
+            "RenderTargetWriteMask": 15,
+            "SourceAlphaBlend": 2,
+            "SourceBlend": 2
+          },
+          {
+            "AlphaBlendOperation": 1,
+            "BlendOperation": 1,
+            "DestinationAlphaBlend": 1,
+            "DestinationBlend": 1,
+            "IsBlendEnabled": false,
+            "RenderTargetWriteMask": 15,
+            "SourceAlphaBlend": 2,
+            "SourceBlend": 2
+          },
+          {
+            "AlphaBlendOperation": 1,
+            "BlendOperation": 1,
+            "DestinationAlphaBlend": 1,
+            "DestinationBlend": 1,
+            "IsBlendEnabled": false,
+            "RenderTargetWriteMask": 15,
+            "SourceAlphaBlend": 2,
+            "SourceBlend": 2
+          }
+        ]
+      },
+      "DepthStencilStates": {
+        "DepthComparison": 2,
+        "DepthWriteMask": 1,
+        "BackFace": {
+          "Comparison": 8,
+          "DepthFailOperation": 1,
+          "FailOperation": 1,
+          "PassOperation": 1
+        },
+        "FrontFace": {
+          "Comparison": 8,
+          "DepthFailOperation": 1,
+          "FailOperation": 1,
+          "PassOperation": 1
+        },
+        "IsDepthEnabled": true,
+        "IsStencilEnabled": false,
+        "StencilReadMask": 255,
+        "StencilWriteMask": 255
+      },
+      "StencilRef": 0,
+      "InputElements": [
+        {
+          "AlignedByteOffset": 0,
+          "Classification": 0,
+          "Format": 6,
+          "InstanceDataStepRate": 0,
+          "SemanticIndex": 0,
+          "SemanticName": "POSITION",
+          "Slot": 0
+        },
+        {
+          "AlignedByteOffset": 12,
+          "Classification": 0,
+          "Format": 6,
+          "InstanceDataStepRate": 0,
+          "SemanticIndex": 0,
+          "SemanticName": "NORMAL",
+          "Slot": 0
+        },
+        {
+          "AlignedByteOffset": 24,
+          "Classification": 0,
+          "Format": 6,
+          "InstanceDataStepRate": 0,
+          "SemanticIndex": 0,
+          "SemanticName": "TANGENT",
+          "Slot": 0
+        },
+        {
+          "AlignedByteOffset": 36,
+          "Classification": 0,
+          "Format": 16,
+          "InstanceDataStepRate": 0,
+          "SemanticIndex": 0,
+          "SemanticName": "TEXCOORD",
+          "Slot": 0
+        }
+      ],
+      "Textures": []
+    },
+    {
+      "VariableValues": {
+        "AmbientColor": "1,1,1,1",
+        "DiffuseColor": "1,1,1,1",
+        "SpecularColor": "0,0,0,1",
+        "Shininess": "5;min=0;max=1",
+        "SphereAddIndensity": "0;min=0;max=1",
+        "SphereMulIndensity": "0;min=0;max=1"
+      },
+      "ShaderEntry": {
+        "ShaderFile": "Toon.hlsl",
+        "VertexShaderFunction": "VS",
+        "PixelShaderFunction": "PS",
+        "GeometryShaderFunction": null,
+        "HullShaderFunction": null,
+        "DomainShaderFunction": null
+      },
+      "RasterizerStates": {
+        "CullMode": 1,
+        "DepthBias": 0,
+        "DepthBiasClamp": 0.0,
+        "FillMode": 3,
+        "IsAntialiasedLineEnabled": false,
+        "IsDepthClipEnabled": true,
+        "IsFrontCounterClockwise": false,
+        "IsMultisampleEnabled": false,
+        "IsScissorEnabled": false,
+        "SlopeScaledDepthBias": 0.0
+      },
+      "BlendStates": {
+        "AlphaToCoverageEnable": false,
+        "IndependentBlendEnable": false,
+        "RenderTarget": [
+          {
+            "AlphaBlendOperation": 1,
+            "BlendOperation": 1,
+            "DestinationAlphaBlend": 1,
+            "DestinationBlend": 1,
+            "IsBlendEnabled": false,
+            "RenderTargetWriteMask": 15,
+            "SourceAlphaBlend": 2,
+            "SourceBlend": 2
+          },
+          {
+            "AlphaBlendOperation": 1,
+            "BlendOperation": 1,
+            "DestinationAlphaBlend": 1,
+            "DestinationBlend": 1,
+            "IsBlendEnabled": false,
+            "RenderTargetWriteMask": 15,
+            "SourceAlphaBlend": 2,
+            "SourceBlend": 2
+          },
+          {
+            "AlphaBlendOperation": 1,
+            "BlendOperation": 1,
+            "DestinationAlphaBlend": 1,
+            "DestinationBlend": 1,
+            "IsBlendEnabled": false,
+            "RenderTargetWriteMask": 15,
+            "SourceAlphaBlend": 2,
+            "SourceBlend": 2
+          },
+          {
+            "AlphaBlendOperation": 1,
+            "BlendOperation": 1,
+            "DestinationAlphaBlend": 1,
+            "DestinationBlend": 1,
+            "IsBlendEnabled": false,
+            "RenderTargetWriteMask": 15,
+            "SourceAlphaBlend": 2,
+            "SourceBlend": 2
+          },
+          {
+            "AlphaBlendOperation": 1,
+            "BlendOperation": 1,
+            "DestinationAlphaBlend": 1,
+            "DestinationBlend": 1,
+            "IsBlendEnabled": false,
+            "RenderTargetWriteMask": 15,
+            "SourceAlphaBlend": 2,
+            "SourceBlend": 2
+          },
+          {
+            "AlphaBlendOperation": 1,
+            "BlendOperation": 1,
+            "DestinationAlphaBlend": 1,
+            "DestinationBlend": 1,
+            "IsBlendEnabled": false,
+            "RenderTargetWriteMask": 15,
+            "SourceAlphaBlend": 2,
+            "SourceBlend": 2
+          },
+          {
+            "AlphaBlendOperation": 1,
+            "BlendOperation": 1,
+            "DestinationAlphaBlend": 1,
+            "DestinationBlend": 1,
+            "IsBlendEnabled": false,
+            "RenderTargetWriteMask": 15,
+            "SourceAlphaBlend": 2,
+            "SourceBlend": 2
+          },
+          {
+            "AlphaBlendOperation": 1,
+            "BlendOperation": 1,
+            "DestinationAlphaBlend": 1,
+            "DestinationBlend": 1,
+            "IsBlendEnabled": false,
+            "RenderTargetWriteMask": 15,
+            "SourceAlphaBlend": 2,
+            "SourceBlend": 2
+          }
+        ]
+      },
+      "DepthStencilStates": {
+        "DepthComparison": 2,
+        "DepthWriteMask": 1,
+        "BackFace": {
+          "Comparison": 8,
+          "DepthFailOperation": 1,
+          "FailOperation": 1,
+          "PassOperation": 1
+        },
+        "FrontFace": {
+          "Comparison": 8,
+          "DepthFailOperation": 1,
+          "FailOperation": 1,
+          "PassOperation": 1
+        },
+        "IsDepthEnabled": true,
+        "IsStencilEnabled": false,
+        "StencilReadMask": 255,
+        "StencilWriteMask": 255
+      },
+      "StencilRef": 0,
+      "InputElements": [
+        {
+          "AlignedByteOffset": 0,
+          "Classification": 0,
+          "Format": 6,
+          "InstanceDataStepRate": 0,
+          "SemanticIndex": 0,
+          "SemanticName": "POSITION",
+          "Slot": 0
+        },
+        {
+          "AlignedByteOffset": 12,
+          "Classification": 0,
+          "Format": 6,
+          "InstanceDataStepRate": 0,
+          "SemanticIndex": 0,
+          "SemanticName": "NORMAL",
+          "Slot": 0
+        },
+        {
+          "AlignedByteOffset": 24,
+          "Classification": 0,
+          "Format": 6,
+          "InstanceDataStepRate": 0,
+          "SemanticIndex": 0,
+          "SemanticName": "TANGENT",
+          "Slot": 0
+        },
+        {
+          "AlignedByteOffset": 36,
+          "Classification": 0,
+          "Format": 16,
+          "InstanceDataStepRate": 0,
+          "SemanticIndex": 0,
+          "SemanticName": "TEXCOORD",
+          "Slot": 0
+        }
+      ],
+      "Textures": [
+        {
+          "TextureFile": "red.png",
+          "AddressU": 3,
+          "AddressV": 3,
+          "AddressW": 3,
+          "BorderColor": {
+            "Red": 0.0,
+            "Green": 0.0,
+            "Blue": 0.0,
+            "Alpha": 0.0
+          },
+          "ComparisonFunction": 1,
+          "Filter": 21,
+          "MaximumAnisotropy": 16,
+          "MaximumLod": 0.0,
+          "MinimumLod": 0.0,
+          "MipLodBias": 0.0
+        },
+        {
+          "TextureFile": "white.png",
+          "AddressU": 3,
+          "AddressV": 3,
+          "AddressW": 3,
+          "BorderColor": {
+            "Red": 0.0,
+            "Green": 0.0,
+            "Blue": 0.0,
+            "Alpha": 0.0
+          },
+          "ComparisonFunction": 1,
+          "Filter": 21,
+          "MaximumAnisotropy": 16,
+          "MaximumLod": 0.0,
+          "MinimumLod": 0.0,
+          "MipLodBias": 0.0
+        },
+        {
+          "TextureFile": "white.png",
+          "AddressU": 3,
+          "AddressV": 3,
+          "AddressW": 3,
+          "BorderColor": {
+            "Red": 0.0,
+            "Green": 0.0,
+            "Blue": 0.0,
+            "Alpha": 0.0
+          },
+          "ComparisonFunction": 1,
+          "Filter": 21,
+          "MaximumAnisotropy": 16,
+          "MaximumLod": 0.0,
+          "MinimumLod": 0.0,
+          "MipLodBias": 0.0
+        }
+      ]
+    }
+  ]
+}

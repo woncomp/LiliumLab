@@ -1,0 +1,67 @@
+{
+  "Entities": [
+    {
+      "Mesh": "Weiss Schnee.obj",
+      "Materials": [
+        "00_body.lm",
+        "01_neck.lm",
+        "02_underwear.lm",
+        "03_eyebackground.lm",
+        "04_face.lm",
+        "05_noname.lm",
+        "06_facedetails.lm",
+        "07_eyebrows.lm",
+        "08_innereye.lm",
+        "09_mouthinside.lm",
+        "10_eye.lm",
+        "11_blush.lm",
+        "12_scar.lm",
+        "13_bangs.lm",
+        "14_ponytail.lm",
+        "15_jacket.lm",
+        "16_top1.lm",
+        "17_sleeves.lm",
+        "18_sleeve2.lm",
+        "19_skirt.lm",
+        "20_underskirt.lm",
+        "21_laceskirt.lm",
+        "22_jacketinner.lm",
+        "23_innerdesign.lm",
+        "24_boots.lm",
+        "25_heel.lm",
+        "26_shoeinner.lm",
+        "27_bagtrim.lm",
+        "28_bag.lm",
+        "29_belt.lm",
+        "30_ribbon.lm",
+        "31_emblem.lm",
+        "32_hair.lm",
+        "33_noname.lm",
+        "34_black.lm",
+        "34_black.lm"
+      ],
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0,
+        "IsNormalized": false,
+        "IsZero": true
+      },
+      "Rotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0,
+        "IsNormalized": false,
+        "IsZero": true
+      },
+      "Scale": {
+        "X": 1.0,
+        "Y": 1.0,
+        "Z": 1.0,
+        "IsNormalized": false,
+        "IsZero": false
+      },
+      "StencilShadowIndensity": 0.477
+    }
+  ]
+}
