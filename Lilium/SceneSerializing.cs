@@ -47,6 +47,7 @@ namespace Lilium.Serializing
 				dest.Position = src.Position;
 				dest.Rotation = src.Rotation;
 				dest.Scale = src.Scale;
+				dest.StencilShadowIndensity = src.StencilShadowIndensity;
 				return dest;
 			}).ToArray();
 		}
@@ -60,10 +61,11 @@ namespace Lilium.Serializing
 				var entity = new Lilium.Entity(entityS.Mesh);
 				if(entity.Mesh != null)
 				{
-					entity.SubmeshMaterials = entityS.Materials.Select(name => Game.Instance.ResourceManager.Material.Load(name)).ToArray();
+					entity.SubmeshMaterials = entityS.Materials.Select(name => name == null ? null : Game.Instance.ResourceManager.Material.Load(name)).ToArray();
 					entity.Position = entityS.Position;
 					entity.Rotation = entityS.Rotation;
 					entity.Scale = entityS.Scale;
+					entity.StencilShadowIndensity = entityS.StencilShadowIndensity;
 					scene.Entities.Add(entity);
 					Game.Instance.AddObject(entity);
 				}
@@ -79,5 +81,7 @@ namespace Lilium.Serializing
 		public Vector3 Position;
 		public Vector3 Rotation;
 		public Vector3 Scale;
+
+		public float StencilShadowIndensity;
 	}
 }

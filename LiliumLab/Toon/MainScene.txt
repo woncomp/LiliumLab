@@ -1,0 +1,44 @@
+{
+  "Entities": [
+    {
+      "Mesh": "IAx.obj",
+      "Materials": [
+        "IAx00_skin.lm",
+        "IAx01_gray.lm",
+        "IAx02_black.lm",
+        "IAx03_outer.lm",
+        "IAx04_pink.lm",
+        "IAx05_shoes.lm",
+        "IAx06_metal.lm",
+        "IAx07_hair.lm",
+        "IAx08_eyeball.lm",
+        "IAx09_eye.lm",
+        "IAx10_face.lm",
+        "IAx11_mouth.lm",
+        "IAx12_eye2.lm"
+      ],
+      "Position": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0,
+        "IsNormalized": false,
+        "IsZero": true
+      },
+      "Rotation": {
+        "X": 0.0,
+        "Y": 0.0,
+        "Z": 0.0,
+        "IsNormalized": false,
+        "IsZero": true
+      },
+      "Scale": {
+        "X": 1.0,
+        "Y": 1.0,
+        "Z": 1.0,
+        "IsNormalized": false,
+        "IsZero": false
+      },
+      "StencilShadowIndensity": 0.313
+    }
+  ]
+}
