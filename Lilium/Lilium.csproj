@@ -163,6 +163,7 @@
     <Compile Include="Debug.cs" />
     <Compile Include="Camera.cs" />
     <Compile Include="Entity.cs" />
+    <Compile Include="FrustumRenderer.cs" />
     <Compile Include="Game_Time.cs" />
     <Compile Include="Grid.cs" />
     <Compile Include="Light.cs" />
