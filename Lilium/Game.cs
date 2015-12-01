@@ -52,6 +52,7 @@ namespace Lilium
 		public StencilShadowRenderer StencilShadowRenderer;
 		public Lilium.Controls.RenderControl RenderControl;
 
+		private LineRenderer debugLine;
 		private Grid grid;
 		private Skydome skydome;
 		private List<IDisposable> _disposeList = new List<IDisposable>();
@@ -95,9 +96,8 @@ namespace Lilium
 			StencilShadowRenderer = new Lilium.StencilShadowRenderer(this);
 			AutoDispose(StencilShadowRenderer);
 
-			DebugLines.Instance = new DebugLines(Device);
-			DebugLines.Instance.Init();
-			AutoDispose(DebugLines.Instance);
+			Debug.Init(this);
+			debugLine = Debug.EDITOR_GetDebugLineRenderer();
 
 			OnStart();
 			Info_Scan();
@@ -117,13 +117,15 @@ namespace Lilium
 			grid.Draw();
 			Info_UpdateData();
 
-			DebugLines.Instance.Update(Config.PreviewSuppressDebugLines);
+			if (!Config.PreviewSuppressDebugLines) debugLine.Draw();
+			debugLine.Clear();
 		}
 
 		public void Dispose()
 		{
 			SelectedObject = null;
 			Utilities.Dispose(ref MainScene);
+			Debug.Shutdown();
 			for (int i = _disposeList.Count; i > 0; )
 			{
 				--i;

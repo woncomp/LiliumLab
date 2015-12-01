@@ -173,6 +173,7 @@
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Input.cs" />
+    <Compile Include="LineRenderer.cs" />
     <Compile Include="Material.cs" />
     <Compile Include="MaterialSerializing.cs" />
     <Compile Include="MaterialVariable.cs" />
