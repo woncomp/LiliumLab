@@ -39,7 +39,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Statue\StatueGame.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Test\TestGame.cs" />
   </ItemGroup>
