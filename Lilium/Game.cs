@@ -49,6 +49,7 @@ namespace Lilium
 		public ResourceManager ResourceManager { get; private set; }
 
 		public Scene MainScene;
+		public SkyBox SkyBox;
 		public StencilShadowRenderer StencilShadowRenderer;
 		public Lilium.Controls.RenderControl RenderControl;
 
@@ -110,7 +111,8 @@ namespace Lilium
 
 			Camera.MainCamera.Begin();
 			UpdatePerFrameBuffer();
-			skydome.Draw();
+			if (SkyBox != null) SkyBox.Draw();
+			else skydome.Draw();
 			MainScene.Draw();
 			OnUpdate();
 
@@ -124,6 +126,7 @@ namespace Lilium
 		public void Dispose()
 		{
 			SelectedObject = null;
+			Utilities.Dispose(ref SkyBox);
 			Utilities.Dispose(ref MainScene);
 			Debug.Shutdown();
 			for (int i = _disposeList.Count; i > 0; )
