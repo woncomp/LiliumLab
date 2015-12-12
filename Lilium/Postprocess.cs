@@ -102,6 +102,7 @@ namespace Lilium
 
 		public void Draw()
 		{
+			if (!Pass.IsValid) return;
 			var dc = game.DeviceContext;
 			if (!active) return;
 

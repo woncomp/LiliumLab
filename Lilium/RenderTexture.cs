@@ -150,7 +150,7 @@ namespace Lilium
 			clearColors[renderTargetIndex] = color;
 		}
 
-		public void Begin()
+		public void Begin(bool clear = true)
 		{
 			if (renderTargetViews.Length > 0)
 			{
@@ -161,17 +161,22 @@ namespace Lilium
 				game.DeviceContext.OutputMerger.SetRenderTargets(depthStencilView, renderTargetViews[0]);
 			}
 			game.DeviceContext.Rasterizer.SetViewport(vp);
-			for (int i = 0; i < renderTargetViews.Length; ++i)
-			{
-				game.DeviceContext.ClearRenderTargetView(renderTargetViews[i], clearColors[i]);
-			}
-			game.DeviceContext.ClearDepthStencilView(depthStencilView, DepthStencilClearFlags.Depth | DepthStencilClearFlags.Stencil, 1, 0);
+			if (clear) Clear();
 		}
 
 		public void End()
 		{
 			game.DeviceContext.OutputMerger.SetRenderTargets(game.DefaultDepthStencilView, game.DefaultRenderTargetView);
 			game.DeviceContext.Rasterizer.SetViewport(game.DefaultViewport);
+		}
+
+		public void Clear()
+		{
+			for (int i = 0; i < renderTargetViews.Length; ++i)
+			{
+				game.DeviceContext.ClearRenderTargetView(renderTargetViews[i], clearColors[i]);
+			}
+			game.DeviceContext.ClearDepthStencilView(depthStencilView, DepthStencilClearFlags.Depth | DepthStencilClearFlags.Stencil, 1, 0);
 		}
 
 		public void Dispose()

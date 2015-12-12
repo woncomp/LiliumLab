@@ -352,6 +352,7 @@ namespace Lilium
 			{
 				IsValid = false;
 				ErrorMessage = e.Message;
+				Debug.Log(e.Message);
 			}
 
 			RasterizerState = new RasterizerState(Device, desc.RasteriazerStates);
