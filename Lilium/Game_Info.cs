@@ -106,7 +106,14 @@ namespace Lilium
 		public void AddResource(SharpDX.Direct3D11.ShaderResourceView texture)
 		{
 			if (texture == null) return;
-			MainForm.Instance.AddObject(new TexturePreview(texture));
+			if (texture.Description.Dimension == SharpDX.Direct3D.ShaderResourceViewDimension.TextureCube)
+			{
+				MainForm.Instance.AddObject(new CubemapPreview(this, texture));
+			}
+			else
+			{
+				MainForm.Instance.AddObject(new TexturePreview(texture));
+			}
 		}
 
 		public void AddControl(Control control)

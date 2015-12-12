@@ -62,7 +62,6 @@ namespace Lilium
 
 		public void Dispose()
 		{
-			cube.Dispose();
 			pass.Dispose();
 			buffer.Dispose();
 		}

@@ -133,6 +133,7 @@
     <Compile Include="Controls\TextArea.Designer.cs">
       <DependentUpon>TextArea.cs</DependentUpon>
     </Compile>
+    <Compile Include="CubemapPreview.cs" />
     <Compile Include="Forms\ResourceBrowser.cs">
       <SubType>Form</SubType>
     </Compile>
