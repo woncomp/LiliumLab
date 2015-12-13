@@ -38,7 +38,8 @@ namespace Lilium
 
 		Mesh cube;
 		Mesh sphere;
-		MaterialPass pass;
+		MaterialPass passCube;
+		MaterialPass passSphere;
 		SkyBox skybox;
 		TexturePreviewQuad mQuad;
 
@@ -67,7 +68,7 @@ namespace Lilium
 			switch ((Mode)mode)
 			{
 				case Mode.Cube:
-					pass.Apply();
+					passCube.Apply();
 					mGame.UpdatePerObjectBuffer(Matrix.Identity);
 					dc.PixelShader.SetShaderResource(0, shaderResourceView);
 					cube.DrawBegin();
@@ -77,7 +78,7 @@ namespace Lilium
 					skybox.Draw();
 					break;
 				case Mode.Sphere:
-					pass.Apply();
+					passSphere.Apply();
 					mGame.UpdatePerObjectBuffer(Matrix.Identity);
 					dc.PixelShader.SetShaderResource(0, shaderResourceView);
 					sphere.DrawBegin();
@@ -136,7 +137,10 @@ namespace Lilium
 			var passDesc = new MaterialPassDesc();
 			passDesc.ManualConstantBuffers = true;
 			passDesc.ShaderFile = "CubemapPreview.hlsl";
-			pass = new MaterialPass(Game.Instance.Device, passDesc, "Preview");
+			passCube = new MaterialPass(Game.Instance.Device, passDesc, "Preview(Cube)");
+
+			passDesc.PixelShaderFunction = "PS_Sphere";
+			passSphere = new MaterialPass(mGame.Device, passDesc, "Preview(Sphere)");
 
 			skybox = new SkyBox(mGame, shaderResourceView, "Preview");
 
@@ -148,7 +152,8 @@ namespace Lilium
 		{
 			Light.IsPreviewingTexture = false;
 			Utilities.Dispose(ref mQuad);
-			Utilities.Dispose(ref pass);
+			Utilities.Dispose(ref passCube);
+			Utilities.Dispose(ref passSphere);
 			Utilities.Dispose(ref skybox);
 			for (int i = 0; i < 6; ++i)
 			{
