@@ -40,19 +40,11 @@ float4 PS(PS_IN input) : SV_Target
 	float3 reflectW;
 	float l;
 
-	baseMapValue = texCube.Sample(s, normalize(input.texCoord));
-
 	normalW = normalize(input.normalW);
-	//diffuse = DiffuseColor * lightDiffuse * saturate(dot(normalW, lightDir)) * Kd;
-
-	//reflectW = reflect(-lightDir.xyz, normalW);
 	eyeDirW = normalize(input.eyeDirW);
-	float rimRange = 0.3;
-	float rimIndensity = 0.4;
-	float rim = clamp(dot(normalW, eyeDirW), 0, rimRange);
-	float4 rimColor = float4(1, 1, 1, 1);
-	rimColor *= (1 - rim / rimRange) * rimIndensity;
-	rimColor.a = 1;
 
-	return baseMapValue + rimColor;
+	float3 r = reflect(-eyeDirW, normalW);
+	baseMapValue = texCube.Sample(s, r);
+
+	return baseMapValue;
 }
