@@ -21,7 +21,7 @@ PS_IN VS( VS_IN input)
 
 	output.position = mul(matProjection, posV);
 
-	output.texCoord = input.position;
+	output.texCoord = normalize(input.position.xyz);
 
 	return output;
 }

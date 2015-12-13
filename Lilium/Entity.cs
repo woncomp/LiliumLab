@@ -11,6 +11,7 @@ namespace Lilium
 	{
 		public Mesh Mesh { get; private set; }
 		public Material[] SubmeshMaterials;
+		public RenderCubemap Cubemap;
 
 		public Vector3 Position = Vector3.Zero;
 		public Vector3 Rotation = Vector3.Zero;
@@ -146,6 +147,7 @@ namespace Lilium
 					material.Passes[j].Apply();
 					material.Passes[j].UpdateConstantBuffers();
 					Mesh.DrawSubmesh(i);
+					material.Passes[j].Clear();
 				}
 			}
 		}

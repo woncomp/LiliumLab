@@ -15,19 +15,12 @@ namespace Lilium
 	[CustomSelectedTypeName("Texture2D")]
 	class TexturePreview : IPreviewable, ISelectable
 	{
-		const int VERTEX_FLOAT_COUNT = 5;
-		const int VERTEX_COUNT = 6;
-
 		public string Name;
 
 		Texture2D tex;
 		
 		ShaderResourceView shaderResourceView;
-
-		float[] vertices = new float[VERTEX_FLOAT_COUNT * VERTEX_COUNT];
-		MaterialPass pass;
-		Buffer vertexBuffer;
-		VertexBufferBinding vertexBufferBinding;
+		TexturePreviewQuad mQuad;
 
 		public TexturePreview(ShaderResourceView shaderResourceView)
 		{
@@ -56,15 +49,7 @@ namespace Lilium
 
 			dc.ClearRenderTargetView(game.DefaultRenderTargetView, Color.Maroon);
 			dc.ClearDepthStencilView(game.DefaultDepthStencilView, DepthStencilClearFlags.Depth, 1, 0);
-
-			pass.Apply();
-
-			dc.InputAssembler.PrimitiveTopology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
-			dc.InputAssembler.SetVertexBuffers(0, vertexBufferBinding);
-
-			dc.PixelShader.SetShaderResource(0, shaderResourceView);
-			dc.Draw(6, 0);
-			dc.PixelShader.SetShaderResource(0, null);
+			if (mQuad != null) mQuad.Draw(shaderResourceView);
 		}
 		
 		public void PreviewActive()
@@ -73,17 +58,7 @@ namespace Lilium
 
 			CreateTextureShaderResourceView(tex);
 			if (shaderResourceView == null) return;
-
-			var passDesc = new MaterialPassDesc();
-			passDesc.ManualConstantBuffers = true;
-			passDesc.ShaderFile = "TexturePreview.hlsl";
-			passDesc.InputElements = new InputElement[]{
-				new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32_Float, 0, 0),
-				new InputElement("TEXCOORD", 0, SharpDX.DXGI.Format.R32G32_Float, 12, 0),
-			};
-			pass = new MaterialPass(Game.Instance.Device, passDesc, "Preview");
-
-			BuildVertexBuffer(tex.Description);
+			mQuad = new TexturePreviewQuad(Game.Instance, tex.Description);
 
 			Light.IsPreviewingTexture = true;
 		}
@@ -97,6 +72,67 @@ namespace Lilium
 			desc.Texture2D.MostDetailedMip = 0;
 			shaderResourceView = new ShaderResourceView(Game.Instance.Device, tex, desc);
 			shaderResourceView.DebugName = "Preview";
+		}
+		
+		public void PreviewDeactive()
+		{
+			Light.IsPreviewingTexture = false;
+			Utilities.Dispose(ref mQuad);
+			Utilities.Dispose(ref shaderResourceView);
+			shaderResourceView = null;
+		}
+
+		public Controls.Control[] Controls
+		{
+			get { return new Controls.Control[0]; }
+		}
+
+		public string NameInObjectList
+		{
+			get { return Name; }
+		}
+	}
+
+	public class TexturePreviewQuad : IDisposable
+	{
+		const int VERTEX_FLOAT_COUNT = 5;
+		const int VERTEX_COUNT = 6;
+
+
+		float[] vertices = new float[VERTEX_FLOAT_COUNT * VERTEX_COUNT];
+		MaterialPass pass;
+		Buffer vertexBuffer;
+		VertexBufferBinding vertexBufferBinding;
+
+		Game game;
+
+		public TexturePreviewQuad(Game game, Texture2DDescription textureDesc)
+		{
+			this.game = game;
+
+			var passDesc = new MaterialPassDesc();
+			passDesc.ManualConstantBuffers = true;
+			passDesc.ShaderFile = "TexturePreview.hlsl";
+			passDesc.InputElements = new InputElement[]{
+				new InputElement("POSITION", 0, SharpDX.DXGI.Format.R32G32B32_Float, 0, 0),
+				new InputElement("TEXCOORD", 0, SharpDX.DXGI.Format.R32G32_Float, 12, 0),
+			};
+			pass = new MaterialPass(Game.Instance.Device, passDesc, "Preview");
+
+			BuildVertexBuffer(textureDesc);
+		}
+
+		public void Draw(ShaderResourceView shaderResourceView)
+		{
+			var dc = game.DeviceContext;
+			pass.Apply();
+
+			dc.InputAssembler.PrimitiveTopology = SharpDX.Direct3D.PrimitiveTopology.TriangleList;
+			dc.InputAssembler.SetVertexBuffers(0, vertexBufferBinding);
+
+			dc.PixelShader.SetShaderResource(0, shaderResourceView);
+			dc.Draw(6, 0);
+			dc.PixelShader.SetShaderResource(0, null);
 		}
 
 		void BuildVertexBuffer(Texture2DDescription textureDesc)
@@ -169,24 +205,11 @@ namespace Lilium
 			vertices[start + 4] = v;
 			start += VERTEX_FLOAT_COUNT;
 		}
-		
-		public void PreviewDeactive()
+
+		public void Dispose()
 		{
-			Light.IsPreviewingTexture = false;
 			Utilities.Dispose(ref pass);
 			Utilities.Dispose(ref vertexBuffer);
-			Utilities.Dispose(ref shaderResourceView);
-			shaderResourceView = null;
-		}
-
-		public Controls.Control[] Controls
-		{
-			get { return new Controls.Control[0]; }
-		}
-
-		public string NameInObjectList
-		{
-			get { return Name; }
 		}
 	}
 }

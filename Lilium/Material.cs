@@ -397,9 +397,13 @@ namespace Lilium
 			for(int i=0;i<shaderResourceBindings.Count;++i)
 			{
 				var b = shaderResourceBindings[i];
-				if(b != null)
+				DeviceContext.PixelShader.SetSampler(b.Slot, b.Sampler);
+				if (b.CubemapEntity != null)
 				{
-					DeviceContext.PixelShader.SetSampler(b.Slot, b.Sampler);
+					DeviceContext.PixelShader.SetShaderResource(b.Slot, b.CubemapEntity.Cubemap.ShaderResourceView);
+				}
+				else
+				{
 					DeviceContext.PixelShader.SetShaderResource(b.Slot, b.Res);
 				}
 			}
@@ -427,7 +431,7 @@ namespace Lilium
 
 			for (int i = 0; i < TextureList.Length || i < shaderResourceBindings.Count; ++i)
 			{
-				DeviceContext.PixelShader.SetSampler(i, null);
+				//DeviceContext.PixelShader.SetSampler(i, null);
 				DeviceContext.PixelShader.SetShaderResource(i, null);
 			}
 		}
@@ -439,24 +443,28 @@ namespace Lilium
 
 		public void BindShaderResource(int slot, ShaderResourceView shaderResourceView, SamplerStateDescription desc)
 		{
+			BindShaderResource(slot, shaderResourceView, null, desc);
+		}
+
+		public void BindRealtimeCubemap(int slot, Entity entity)
+		{
+			BindShaderResource(slot, null, entity, SamplerStateDescription.Default());
+		}
+
+		private void BindShaderResource(int slot, ShaderResourceView shaderResourceView, Entity cubemapEntity, SamplerStateDescription desc)
+		{
 			while (shaderResourceBindings.Count <= slot) shaderResourceBindings.Add(null);
-			if(shaderResourceBindings[slot] != null)
+			if (shaderResourceBindings[slot] != null)
 			{
 				Utilities.Dispose(ref shaderResourceBindings[slot].Sampler);
 			}
-			if(shaderResourceView == null)
+			shaderResourceBindings[slot] = new ShaderResourceBinding()
 			{
-				shaderResourceBindings[slot] = null;
-			}
-			else
-			{
-				shaderResourceBindings[slot] = new ShaderResourceBinding()
-				{
-					Slot = slot,
-					Res = shaderResourceView,
-					Sampler = new SamplerState(Device, desc),
-				};
-			}
+				Slot = slot,
+				Res = shaderResourceView,
+				Sampler = new SamplerState(Device, desc),
+				CubemapEntity = cubemapEntity,
+			};
 		}
 
 		public void SerializeVariables(Dictionary<string, string> dic)
@@ -711,6 +719,7 @@ namespace Lilium
 			public int Slot;
 			public ShaderResourceView Res;
 			public SamplerState Sampler;
+			public Entity CubemapEntity;
 		}
 	}
 }

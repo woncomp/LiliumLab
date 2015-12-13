@@ -109,6 +109,10 @@ namespace Lilium
 			Light.MainLight.Update();
 			Time_Update(true);
 
+			foreach (var entity in MainScene.Entities)
+			{
+				if (entity.Cubemap != null) entity.Cubemap.CaptureSceneAtPosition(entity.Position);
+			}
 			Camera.MainCamera.Begin();
 			UpdatePerFrameBuffer();
 			if (SkyBox != null) SkyBox.Draw();
@@ -159,6 +163,8 @@ namespace Lilium
 			public Matrix matWorldViewInverseTranspose;
 		}
 
+		public RenderCubemap CurrentCubemap { get; set; }
+
 		Buffer perFrameBuffer;
 		Buffer perObjectBuffer;
 
@@ -178,16 +184,33 @@ namespace Lilium
 		{
 			var light = Light.MainLight;
 
-			perFrameData.matView = Camera.ActiveCamera.ViewMatrix;
-			perFrameData.matProjection = Camera.ActiveCamera.ProjectionMatrix;
+			if (CurrentCubemap != null)
+			{
+				perFrameData.matView = CurrentCubemap.ViewMatrix;
+				perFrameData.matProjection = RenderCubemap.PROJECTION_MATRIX;
+				perFrameData.eyePos = new Vector4(CurrentCubemap.Position, 1);
+				perFrameData.cameraNearPlane = RenderCubemap.NEAR_PLANE;
+				perFrameData.cameraFarPlane = RenderCubemap.FAR_PLANE;
+
+				perFrameData.renderTargetWidth = CurrentCubemap.Viewport.Width;
+				perFrameData.renderTargetHeight = CurrentCubemap.Viewport.Height;
+			}
+			else
+			{
+				perFrameData.matView = Camera.ActiveCamera.ViewMatrix;
+				perFrameData.matProjection = Camera.ActiveCamera.ProjectionMatrix;
+				perFrameData.eyePos = new Vector4(Camera.ActiveCamera.Position, 1);
+				perFrameData.cameraNearPlane = Camera.ActiveCamera.NearPlane;
+				perFrameData.cameraFarPlane = Camera.ActiveCamera.FarPlane;
+
+				perFrameData.renderTargetWidth = DefaultViewport.Width;
+				perFrameData.renderTargetHeight = DefaultViewport.Height;
+			}
+
 			perFrameData.lightDir = light.LightDir4;
-			perFrameData.eyePos = new Vector4(Camera.ActiveCamera.Position, 1);
 			perFrameData.ambientColor = light.AmbientColor;
 			perFrameData.diffuseColor = light.DiffuseColor;
-			perFrameData.renderTargetWidth = DefaultViewport.Width;
-			perFrameData.renderTargetHeight = DefaultViewport.Height;
-			perFrameData.cameraNearPlane = Camera.ActiveCamera.NearPlane;
-			perFrameData.cameraFarPlane = Camera.ActiveCamera.FarPlane;
+
 			DeviceContext.UpdateSubresource(ref perFrameData, perFrameBuffer);
 			DeviceContext.VertexShader.SetConstantBuffer(1, perFrameBuffer);
 			DeviceContext.PixelShader.SetConstantBuffer(1, perFrameBuffer);

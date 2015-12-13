@@ -48,7 +48,14 @@ namespace Lilium
 			pass.Apply();
 
 			var data = new Data();
-			data.matWorld2 = Matrix.Translation(Camera.ActiveCamera.Position);
+			if (game.CurrentCubemap != null)
+			{
+				data.matWorld2 = Matrix.Translation(game.CurrentCubemap.Position);
+			}
+			else
+			{
+				data.matWorld2 = Matrix.Translation(Camera.ActiveCamera.Position);
+			}
 
 			var dc = game.DeviceContext;
 			dc.UpdateSubresource(ref data, buffer);
@@ -58,6 +65,7 @@ namespace Lilium
 			
 			cube.DrawBegin();
 			cube.DrawSubmesh(0);
+			pass.Clear();
 		}
 
 		public void Dispose()
