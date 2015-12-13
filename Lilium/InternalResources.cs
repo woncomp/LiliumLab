@@ -13,12 +13,15 @@ namespace Lilium
 		public const string MESH_QUAD = "../../../InternalAssets/Mesh/QUAD##";
 		public const string MESH_CUBE = "Internal_Cube";
 		public const string MESH_SPHERE = "Internal_Sphere";
-		public const string MESH_PLANE = "Internal_plane";
-		public const string MESH_TEAPOT = "Internal_teapot";
+		public const string MESH_PLANE = "Internal_Plane";
+		public const string MESH_TEAPOT = "Internal_Teapot";
 
 		public const string TEX_BRICK_D = "brick_d.png";
 		public const string TEX_BRICK_N = "brick_n.png";
 		public const string TEX_WOOD = "wood.png";
+
+		public const string CUBE_MARS = "cubemap_mars.dds";
+		public const string CUBE_SNOW = "cubemap_snow.dds";
 
 		public const string MESH_TABLE = "table.obj";
 
