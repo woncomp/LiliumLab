@@ -15,7 +15,7 @@ namespace LiliumLab
 		static void Main()
 		{
 			Lilium.Config.DebugMode = true;
-			Lilium.Game.Run<TestGame>();
+			Lilium.Game.Run<EnvironmentGame>();
 		}
 	}
 }
