@@ -15,7 +15,7 @@ namespace LiliumLab
 {
 	public class ScreenSpaceMetaballGame : Game
 	{
-		class Motion
+		public class Motion
 		{
 			public Vector3 Position;
 			public Vector4 Color;

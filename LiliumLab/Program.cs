@@ -15,7 +15,7 @@ namespace LiliumLab
 		static void Main()
 		{
 			Lilium.Config.DebugMode = true;
-			Lilium.Game.Run<ScreenSpaceMetaballGame>();
+			Lilium.Game.Run<SecondMetaballGame>();
 		}
 	}
 }
