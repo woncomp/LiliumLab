@@ -253,8 +253,10 @@ namespace Lilium
 				if(rotateYZ)
 					mat = Matrix.RotationX(-MathUtil.PiOverTwo);
 
+				bool a = filePath.EndsWith("fbx");
 				foreach (var aiMesh in scene.Meshes)
 				{
+					//if (a) { a = false; continue; }
 					builder.BeginSubmesh();
 
 					for (int i = 0; i < aiMesh.VertexCount; ++i)
@@ -278,7 +280,18 @@ namespace Lilium
 						builder.Vertex(v);
 					}
 
-					aiMesh.GetIntIndices().ToList().ForEach(builder.Index);
+					//aiMesh.GetIntIndices().ToList().ForEach(builder.Index);
+
+					for (int i = 0; i < aiMesh.FaceCount; ++i)
+					{
+						var face = aiMesh.Faces[i];
+						for (int j = 1; j < face.IndexCount - 1;++j )
+						{
+							builder.Index( face.Indices[0]);
+							builder.Index( face.Indices[j]);
+							builder.Index( face.Indices[j+1]);
+						}
+					}
 
 					if (scene.HasMaterials)
 					{
@@ -318,7 +331,7 @@ namespace Lilium
 				var builder = new MeshBuilder();
 				builder.BeginSubmesh();
 
-				int index = 0;
+				uint index = 0;
 
 				while(!sr.EndOfStream)
 				{
@@ -348,6 +361,8 @@ namespace Lilium
 		int vertexCount = 0;
 		int indexCount = 0;
 
+		public int IndexCount { get { return indexCount; } }
+
 		public MeshBuilder()
 		{
 		}
@@ -374,7 +389,7 @@ namespace Lilium
 			vertexCount++;
 		}
 
-		public void Index(int index)
+		public void Index(uint index)
 		{
 			BeginSubmesh();
 			currentSubmesh.Indices.Add(index);
@@ -394,7 +409,7 @@ namespace Lilium
 			public Vector3 AccumTangent = new Vector3();
 		}
 
-		private void ComputeTangent(List<MeshVertex> vertices, List<int> indices)
+		private void ComputeTangent(List<MeshVertex> vertices, List<uint> indices)
 		{
 			Vector3[] tangents = vertices.Select(mv => new Vector3()).ToArray();
 			Vector3[] binormals = vertices.Select(mv => new Vector3()).ToArray();
@@ -404,9 +419,9 @@ namespace Lilium
 				int i1 = 3*i+1;
 				int i2 = 3*i+2;
 				
-				var vert0 = vertices[indices[i0]];
-				var vert1 = vertices[indices[i1]];
-				var vert2 = vertices[indices[i2]];
+				var vert0 = vertices[(int)indices[i0]];
+				var vert1 = vertices[(int)indices[i1]];
+				var vert2 = vertices[(int)indices[i2]];
 				var p0 = vert0.Position;
 				var p1 = vert1.Position;
 				var p2 = vert2.Position;
@@ -427,7 +442,7 @@ namespace Lilium
 
 				for (int j = 0; j < 3; ++j)
 				{
-					int idx = indices[i0 + j];
+					var idx = indices[i0 + j];
 					tangents[idx] += t;
 					binormals[idx] += b;
 				}
@@ -453,7 +468,7 @@ namespace Lilium
 			var mesh = new Mesh(device);
 
 			List<MeshVertex> vertices = new List<MeshVertex>();
-			List<int> indices = new List<int>();
+			List<uint> indices = new List<uint>();
 
 			foreach(var smInfo in submeshes)
 			{
@@ -463,7 +478,7 @@ namespace Lilium
 
 				mesh.submeshes.Add(submesh);
 
-				indices.AddRange(smInfo.Indices.Select(i => vertices.Count + i));
+				indices.AddRange(smInfo.Indices.Select(i => (uint)(vertices.Count + i)));
 				vertices.AddRange(smInfo.Vertices);
 			}
 
@@ -483,7 +498,7 @@ namespace Lilium
 		class SubmeshInfo
 		{
 			public List<MeshVertex> Vertices = new List<MeshVertex>();
-			public List<int> Indices = new List<int>();
+			public List<uint> Indices = new List<uint>();
 
 			public List<string> Textures = new List<string>();
 		}
