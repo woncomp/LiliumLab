@@ -649,7 +649,8 @@ namespace Lilium
 				{
 					var variable = constantBuffer.GetVariable(j);
 					MaterialVariable av = null;
-					switch (variable.GetVariableType().Description.Class)
+					var cls = variable.GetVariableType().Description.Class;
+					switch (cls)
 					{
 						case ShaderVariableClass.Scalar:
 							av = new MaterialFloatVariable(variable);
@@ -689,10 +690,12 @@ namespace Lilium
 						//	break;
 						//case ShaderVariableClass.Struct:
 						//	break;
+						case ShaderVariableClass.MatrixColumns:
+							break;
 						default:
-							throw new Exception("ScanConstantBuffers() -> variable.GetVariableType().Description.Class");
+							throw new Exception("ScanConstantBuffers() -> variable.GetVariableType().Description.Class : " + cls);
 					}
-					acb.Variables.Add(av);
+					if(av != null) acb.Variables.Add(av);
 				}
 				acb.Variables.Sort((a, b) => a.StartOffset - b.StartOffset);
 				acb.Init(Device);

@@ -10,6 +10,8 @@ namespace Lilium
 	public class Entity : IDisposable, ISelectable
 	{
 		public Mesh Mesh { get; private set; }
+        public SkinnedMesh SkinnedMesh { get; private set; }
+
 		public Material[] SubmeshMaterials;
 		public RenderCubemap Cubemap;
 
@@ -38,6 +40,14 @@ namespace Lilium
 			SubmeshMaterials = new Material[mesh.SubmeshCount];
 			CreateControls();
 		}
+
+        public Entity(SkinnedMesh skinnedMesh)
+        {
+            this.SkinnedMesh = skinnedMesh;
+            this.Name = "Entity" + Debug.NextObjectId;
+            SubmeshMaterials = new Material[skinnedMesh.submeshes.Count];
+            CreateControls();
+        }
 
 		public Entity(string meshName)
 		{
@@ -72,7 +82,7 @@ namespace Lilium
 
 		public void Draw()
 		{
-			if (Mesh == null) return;
+			if (Mesh == null && SubmeshMaterials == null) return;
 
 			if (Game.Instance.SelectedObject == this)
 			{
@@ -125,31 +135,67 @@ namespace Lilium
 
 		public void DrawWithMaterials(Material[] materials)
 		{
-			if (materials.Length < Mesh.SubmeshCount)
-				Debug.Log("[Entity::DrawWithMaterials] Length of provided material array doesn't match with the submesh count.(" + this.Name + ")");
-			Game.Instance.UpdatePerObjectBuffer(TransformMatrix);
+            if(Mesh != null)
+            { 
+			    if (materials.Length < Mesh.SubmeshCount)
+				    Debug.Log("[Entity::DrawWithMaterials] Length of provided material array doesn't match with the submesh count.(" + this.Name + ")");
+			    Game.Instance.UpdatePerObjectBuffer(TransformMatrix);
 
-			Mesh.DrawBegin();
+			    Mesh.DrawBegin();
 
-			for (int i = 0; i < Mesh.SubmeshCount; ++i)
-			{
-				Material material = null;
-				if (materials != null)
-				{
-					if (i < materials.Length) material = materials[i];
-					else material = materials[materials.Length - 1];
-				}
-				if (material == null) material = Game.Instance.ResourceManager.Material.DefaultDiffuse;
-				if (!material.IsValid) continue;
+			    for (int i = 0; i < Mesh.SubmeshCount; ++i)
+			    {
+				    Material material = null;
+				    if (materials != null)
+				    {
+					    if (i < materials.Length) material = materials[i];
+					    else material = materials[materials.Length - 1];
+				    }
+				    if (material == null) material = Game.Instance.ResourceManager.Material.DefaultDiffuse;
+				    if (!material.IsValid) continue;
 
-				for (int j = 0; j < material.Passes.Length; ++j)
-				{
-					material.Passes[j].Apply();
-					material.Passes[j].UpdateConstantBuffers();
-					Mesh.DrawSubmesh(i);
-					material.Passes[j].Clear();
-				}
-			}
+				    for (int j = 0; j < material.Passes.Length; ++j)
+				    {
+					    material.Passes[j].Apply();
+					    material.Passes[j].UpdateConstantBuffers();
+					    Mesh.DrawSubmesh(i);
+					    material.Passes[j].Clear();
+				    }
+			    }
+            }
+            else if(SkinnedMesh != null)
+            {
+			    if (materials.Length < SkinnedMesh.submeshes.Count)
+				    Debug.Log("[Entity::DrawWithMaterials] Length of provided material array doesn't match with the submesh count.(" + this.Name + ")");
+
+                SkinnedMesh.UpdateSkinning();
+
+			    Game.Instance.UpdatePerObjectBuffer(TransformMatrix);
+                
+			    for (int i = 0; i < SkinnedMesh.submeshes.Count; ++i)
+			    {
+					var submesh = SkinnedMesh.submeshes[i];
+					if (!submesh.Show) continue;
+				    Material material = null;
+				    if (materials != null)
+				    {
+					    if (i < materials.Length) material = materials[i];
+					    else material = materials[materials.Length - 1];
+				    }
+				    if (material == null) material = Game.Instance.ResourceManager.Material.DefaultDiffuse;
+				    if (!material.IsValid) continue;
+
+				    for (int j = 0; j < material.Passes.Length; ++j)
+				    {
+					    material.Passes[j].Apply();
+					    material.Passes[j].UpdateConstantBuffers();
+						submesh.Draw();
+					    material.Passes[j].Clear();
+				    }
+			    }
+
+                DrawSkeletonRecursively(SkinnedMesh.skeleton);
+            }
 		}
 
 		public void DrawWithMaterial(Material material)
@@ -161,6 +207,7 @@ namespace Lilium
 
 		void DrawStencilShadow()
 		{
+            if(Mesh == null) return;
 			Game.Instance.StencilShadowRenderer.Begin(this.TransformMatrix, new Plane(0, 1, 0, -0.001f), StencilShadowIndensity);
 			Mesh.DrawBegin();
 			for (int j = 0; j < Mesh.SubmeshCount; ++j)
@@ -168,6 +215,21 @@ namespace Lilium
 				Mesh.DrawSubmesh(j);
 			}
 		}
+        
+        void DrawSkeletonRecursively(SkeletonNode node)
+        {
+			if (!node.DbgDrawBone) return;
+            var matrix = TransformMatrix;
+            Vector3 from;
+            if(node.Parent != null) from = Vector3.TransformCoordinate(Vector3.Zero, node.Parent.GlobalTransform* matrix);
+            else from = Vector3.TransformCoordinate(Vector3.Zero, matrix);
+            var to = Vector3.TransformCoordinate(Vector3.Zero, node.GlobalTransform * matrix);
+            Debug.Line(from, to, Color.Red);
+            for(int i=0;i<node.Children.Count;++i)
+            {
+                DrawSkeletonRecursively(node.Children[i]);
+            }
+        }
 
 		public void Dispose()
 		{
@@ -196,10 +258,33 @@ namespace Lilium
 			list.Add(toggle);
 			var slider = new Lilium.Controls.Slider("Stencil Shadow", 0, 1, () => StencilShadowIndensity, val => StencilShadowIndensity = val);
 			list.Add(slider);
-			for (int i = 0; i < Mesh.SubmeshCount; ++i)
-			{
-				list.Add(new Lilium.Controls.EntityMaterialSlot(this, i));
-			}
+            if(SkinnedMesh != null && SkinnedMesh.AnimationClips.Count > 0)
+            {
+                foreach (var anim in SkinnedMesh.AnimationClips)
+                {
+                    var animName = anim.Key;
+                    //var anim
+                    var btn = new Lilium.Controls.Button("Play " + animName, ()=>
+                        {
+                            SkinnedMesh.PlayAnimation(animName);
+                        });
+                    list.Add(btn);
+                }
+            }
+            if (Mesh != null)
+            {
+                for (int i = 0; i < Mesh.SubmeshCount; ++i)
+                {
+                    list.Add(new Lilium.Controls.EntityMaterialSlot(this, i));
+                }
+            }
+            if (SkinnedMesh != null)
+            {
+                for (int i = 0; i < SkinnedMesh.submeshes.Count; ++i)
+                {
+                    list.Add(new Lilium.Controls.EntityMaterialSlot(this, i));
+                }
+            }
 			controls = list.ToArray();
 		}
 

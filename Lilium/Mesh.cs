@@ -253,10 +253,8 @@ namespace Lilium
 				if(rotateYZ)
 					mat = Matrix.RotationX(-MathUtil.PiOverTwo);
 
-				bool a = filePath.EndsWith("fbx");
 				foreach (var aiMesh in scene.Meshes)
 				{
-					//if (a) { a = false; continue; }
 					builder.BeginSubmesh();
 
 					for (int i = 0; i < aiMesh.VertexCount; ++i)
@@ -275,7 +273,11 @@ namespace Lilium
 							v.Tangent = Vector3.TransformNormal(v.Tangent, mat);
 						}
 
-						if (aiMesh.HasTextureCoords(0)) v.TexCoord = _MakeTexCoord(aiMesh.GetTextureCoords(0)[i]);
+						if (aiMesh.HasTextureCoords(0))
+                        {
+                            var texCoords = aiMesh.GetTextureCoords(0);
+                            v.TexCoord = _MakeTexCoord(texCoords[i]);
+                        }
 
 						builder.Vertex(v);
 					}
@@ -287,32 +289,32 @@ namespace Lilium
 						var face = aiMesh.Faces[i];
 						for (int j = 1; j < face.IndexCount - 1;++j )
 						{
-							builder.Index( face.Indices[0]);
-							builder.Index( face.Indices[j]);
-							builder.Index( face.Indices[j+1]);
+							builder.Index((uint) face.Indices[0]);
+							builder.Index((uint) face.Indices[j]);
+							builder.Index((uint) face.Indices[j+1]);
 						}
 					}
 
-					if (scene.HasMaterials)
-					{
-						var folder = System.IO.Path.GetDirectoryName(filePath);
-						var materialIndex = aiMesh.MaterialIndex;
-						if (materialIndex >= 0 && materialIndex < scene.Materials.Length)
-						{
-							var material = scene.Materials[materialIndex];
-							var textures = material.GetTextures(TextureType.Diffuse);
-							if (textures != null)
-							{
-								builder.Texture(0, System.IO.Path.Combine(folder, textures[0].FilePath));
-							}
-							textures = material.GetTextures(TextureType.Ambient);
-							if (textures != null)
-								builder.Texture(1, System.IO.Path.Combine(folder, textures[0].FilePath));
-							textures = material.GetTextures(TextureType.Specular);
-							if (textures != null)
-								builder.Texture(2, System.IO.Path.Combine(folder, textures[0].FilePath));
-						}
-					}
+                    //if (scene.HasMaterials)
+                    //{
+                    //    var folder = System.IO.Path.GetDirectoryName(filePath);
+                    //    var materialIndex = aiMesh.MaterialIndex;
+                    //    if (materialIndex >= 0 && materialIndex < scene.Materials.Length)
+                    //    {
+                    //        var material = scene.Materials[materialIndex];
+                    //        var textures = material.GetTextures(TextureType.Diffuse);
+                    //        if (textures != null)
+                    //        {
+                    //            builder.Texture(0, System.IO.Path.Combine(folder, textures[0].FilePath));
+                    //        }
+                    //        textures = material.GetTextures(TextureType.Ambient);
+                    //        if (textures != null)
+                    //            builder.Texture(1, System.IO.Path.Combine(folder, textures[0].FilePath));
+                    //        textures = material.GetTextures(TextureType.Specular);
+                    //        if (textures != null)
+                    //            builder.Texture(2, System.IO.Path.Combine(folder, textures[0].FilePath));
+                    //    }
+                    //}
 
 					builder.EndSubmesh();
 				}

@@ -22,6 +22,7 @@
     <WarningLevel>4</WarningLevel>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -33,8 +34,9 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AssimpNet">
-      <HintPath>W:\LilyDX\Library\AssimpNet.dll</HintPath>
+    <Reference Include="AssimpNet, Version=3.2.0.0, Culture=neutral, PublicKeyToken=0d51b391f59f42a6, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\LilyDX\Library\AssimpNet.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -69,6 +71,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Mesh\AnimationClip.cs" />
+    <Compile Include="Mesh\AnimationState.cs" />
+    <Compile Include="Mesh\BufferData.cs" />
     <Compile Include="Config.cs" />
     <Compile Include="Controls\Button.cs">
       <SubType>UserControl</SubType>
@@ -180,6 +185,7 @@
     <Compile Include="MaterialSerializing.cs" />
     <Compile Include="MaterialVariable.cs" />
     <Compile Include="MeshPreview.cs" />
+    <Compile Include="Mesh\SkinnedMeshLoading_Fbxsdk.cs" />
     <Compile Include="Postprocess.cs" />
     <Compile Include="RenderCubemap.cs" />
     <Compile Include="RenderTexture.cs">
@@ -194,6 +200,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Game.cs" />
     <Compile Include="SceneSerializing.cs" />
+    <Compile Include="Mesh\SkinnedMesh.cs" />
     <Compile Include="SkyBox.cs" />
     <Compile Include="Skydome.cs" />
     <Compile Include="StencilShadowRenderer.cs" />
@@ -250,12 +257,19 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assimp64.dll">
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\Library\Assimp64.dll">
+      <Link>Assimp64.dll</Link>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
+    <ProjectReference Include="W:\LiliumLab\LiliumFbx\LiliumFbx.vcxproj">
+      <Project>{e169d7db-3ee4-4add-adb7-513bb9f5b5ef}</Project>
+      <Name>LiliumFbx</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

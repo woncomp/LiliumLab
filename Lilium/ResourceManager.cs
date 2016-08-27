@@ -27,10 +27,12 @@ namespace Lilium
 		public Loader<ShaderResourceView> Tex2D { get { return tex2D; } }
 		public Loader<Mesh> Mesh { get { return mesh; } }
 		public MaterialLoader Material { get { return material; } }
+        public SkinnedMeshLoader SkinnedMesh { get { return skinnedMeshLoader; } }
 
 		Texture2DLoader tex2D;
 		MaterialLoader material;
 		MeshLoader mesh;
+        SkinnedMeshLoader skinnedMeshLoader;
 
 		public ResourceManager(Game game)
 		{
@@ -39,6 +41,7 @@ namespace Lilium
 			this.tex2D = Texture2DLoader.Create<Texture2DLoader>(this);
 			this.material = MaterialLoader.Create<MaterialLoader>(this);
 			this.mesh = MeshLoader.Create<MeshLoader>(this);
+            this.skinnedMeshLoader = SkinnedMeshLoader.Create<SkinnedMeshLoader>(this);
 		}
 
 		public void Init()
@@ -238,4 +241,25 @@ namespace Lilium
 			return mesh;
 		}
 	}
+
+    public class SkinnedMeshLoader : Loader<SkinnedMesh>
+    {
+		public override string SubfolderName { get { return "SkinnedMesh"; } }
+
+		private AnimationClipCreateInfo[] extraArgs0 = null;
+
+		public SkinnedMesh LoadFbx(string resName, AnimationClipCreateInfo[] clips = null)
+		{
+			extraArgs0 = clips;
+			return Load(resName, true);
+		}
+
+        protected override SkinnedMesh LoadFunc(Device device, string filePath)
+        {
+            SkinnedMesh mesh = SkinnedMesh.CreateWithFbxsdk(device, filePath, extraArgs0);
+            mesh.ResourceName = LoadingResourceName;
+            Game.Instance.AddObject(mesh);
+            return mesh;
+        }
+    }
 }
