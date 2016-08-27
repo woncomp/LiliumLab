@@ -28,11 +28,13 @@ namespace Lilium
 		public Loader<Mesh> Mesh { get { return mesh; } }
 		public MaterialLoader Material { get { return material; } }
         public SkinnedMeshLoader SkinnedMesh { get { return skinnedMeshLoader; } }
+		public Loader<UIFont> Font { get { return fontLoader;  } }
 
 		Texture2DLoader tex2D;
 		MaterialLoader material;
 		MeshLoader mesh;
         SkinnedMeshLoader skinnedMeshLoader;
+		FontLoader fontLoader;
 
 		public ResourceManager(Game game)
 		{
@@ -42,6 +44,7 @@ namespace Lilium
 			this.material = MaterialLoader.Create<MaterialLoader>(this);
 			this.mesh = MeshLoader.Create<MeshLoader>(this);
             this.skinnedMeshLoader = SkinnedMeshLoader.Create<SkinnedMeshLoader>(this);
+			this.fontLoader = FontLoader.Create<FontLoader>(this);
 		}
 
 		public void Init()
@@ -262,4 +265,17 @@ namespace Lilium
             return mesh;
         }
     }
+
+	public class FontLoader : Loader<UIFont>
+	{
+		public override string SubfolderName		{			get { return "Font"; }		}
+
+		protected override UIFont LoadFunc(Device device, string filePath)
+		{
+			UIFont font = new UIFont();
+			font.Load(device, filePath);
+			font.Texture.DebugName = Path.GetFileNameWithoutExtension(filePath);
+			return font;
+		}
+	}
 }

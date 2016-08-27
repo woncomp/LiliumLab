@@ -15,6 +15,7 @@ namespace LiliumLab
 {
 	public class TestGame : Game
 	{
+		UILabel mFPSLabel;
 		
 		protected override void OnStart()
 		{
@@ -23,11 +24,21 @@ namespace LiliumLab
 			//var path = System.IO.Path.Combine(Game.Instance.ResourceManager.FirstSearchFolder, "MainScene.txt");
 			//if (System.IO.File.Exists(path))
 			//	MainScene.Load(path);
+
+			mFPSLabel = new UILabel();
+			mFPSLabel.SetFont("font.fnt");
+			UI.AddWidget(mFPSLabel);
+
+			var label = new UILabel();
+			label.Position = new Vector2(0, 600);
+			label.SetFont("font.fnt");
+			label.Text = "Lorem ipsum dolor sit amet,\nconsectetuer adipiscing elit.\n9876543210";
+			UI.AddWidget(label);
 		}
 
 		protected override void OnUpdate()
 		{
-			
+			mFPSLabel.Text = string.Format("{0:00.00}ms",(FrameTime * 1000));
 		}
 	}
 }

@@ -47,6 +47,7 @@ namespace Lilium
 
 		public Input Input { get { return RenderControl.Input; } }
 		public ResourceManager ResourceManager { get; private set; }
+		public UISurface UI { get { return mUISurface;  } }
 
 		public Scene MainScene;
 		public SkyBox SkyBox;
@@ -56,6 +57,7 @@ namespace Lilium
 		private LineRenderer debugLine;
 		private Grid grid;
 		private Skydome skydome;
+		private UISurface mUISurface;
 		private List<IDisposable> _disposeList = new List<IDisposable>();
 		
 		public void AutoDispose(IDisposable disposeable)
@@ -93,6 +95,8 @@ namespace Lilium
 			AutoDispose(grid);
 			skydome = new Skydome(Device);
 			AutoDispose(skydome);
+			mUISurface = new UISurface(Device);
+			AutoDispose(mUISurface);
 
 			StencilShadowRenderer = new Lilium.StencilShadowRenderer(this);
 			AutoDispose(StencilShadowRenderer);
@@ -125,6 +129,7 @@ namespace Lilium
 
 			if (!Config.PreviewSuppressDebugLines) debugLine.Draw();
 			debugLine.Clear();
+			mUISurface.Draw();
 		}
 
 		public void Dispose()

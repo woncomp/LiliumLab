@@ -205,6 +205,12 @@
     <Compile Include="Skydome.cs" />
     <Compile Include="StencilShadowRenderer.cs" />
     <Compile Include="TexturePreview.cs" />
+    <Compile Include="UI\UIFont.cs" />
+    <Compile Include="UI\UILabel.cs" />
+    <Compile Include="UI\UISurface.cs" />
+    <Compile Include="UI\UISurfaceBatch.cs" />
+    <Compile Include="UI\UIVertex.cs" />
+    <Compile Include="UI\UIWidget.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Controls\Button.resx">
@@ -266,6 +272,10 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\BitmapFontParser\Cyotek.Drawing.BitmapFont.csproj">
+      <Project>{a8e42972-0bc3-4f26-99df-87b6379e875f}</Project>
+      <Name>Cyotek.Drawing.BitmapFont</Name>
+    </ProjectReference>
     <ProjectReference Include="W:\LiliumLab\LiliumFbx\LiliumFbx.vcxproj">
       <Project>{e169d7db-3ee4-4add-adb7-513bb9f5b5ef}</Project>
       <Name>LiliumFbx</Name>
