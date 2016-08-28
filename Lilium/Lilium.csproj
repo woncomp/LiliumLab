@@ -71,6 +71,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Game_Device.cs" />
     <Compile Include="Mesh\AnimationClip.cs" />
     <Compile Include="Mesh\AnimationState.cs" />
     <Compile Include="Mesh\BufferData.cs" />
@@ -150,9 +151,6 @@
     </Compile>
     <Compile Include="Forms\MaterialEditor.Designer.cs">
       <DependentUpon>PropertiesForm.cs</DependentUpon>
-    </Compile>
-    <Compile Include="Controls\RenderControl.cs">
-      <SubType>UserControl</SubType>
     </Compile>
     <Compile Include="Controls\Slider.cs">
       <SubType>UserControl</SubType>

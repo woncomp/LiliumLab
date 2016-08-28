@@ -5,15 +5,19 @@ using System.Text;
 using System.Threading.Tasks;
 using SharpDX;
 using SharpDX.DXGI;
-using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
-using SharpDX.Windows;
+
+using Device = SharpDX.Direct3D11.Device;
+using Buffer = SharpDX.Direct3D11.Buffer;
+using SharpDX.Direct3D;
 using System.Windows.Forms;
 
-namespace Lilium.Controls
+namespace Lilium
 {
-	public class RenderControl : SharpDX.Windows.RenderControl
+	public partial class Game
 	{
+		public bool IsEditor { get; private set; }
+
 		public SharpDX.DXGI.SwapChain SwapChain { get; private set; }
 		public SharpDX.Direct3D11.Device Device { get; private set; }
 		public SharpDX.Direct3D11.DeviceContext DeviceContext { get; private set; }
@@ -21,11 +25,8 @@ namespace Lilium.Controls
 		public RenderTargetView DefaultRenderTargetView { get { return _backbufferView; } }
 		public DepthStencilView DefaultDepthStencilView { get { return _zbufferView; } }
 
-		public Input Input { get; private set; }
-
-		public event System.Action Start;
-		public new event System.Action Update;
-		public event System.Action WillDispose;
+		public System.Drawing.Size RenderViewSize { get; private set; }
+		public IntPtr ControlHandle { get; private set; }
 
 		private bool needResize = false;
 
@@ -34,38 +35,68 @@ namespace Lilium.Controls
 
 		private Timer renderTimer;
 
-		public void Startup()
+		public void BindWithWindow(SharpDX.Windows.RenderForm c)
 		{
-			CreateDevice();
-
 			this.Input = new Input();
-			this.Input.Hook(this);
+			this.Input.Hook(c);
 
-			if (Start != null) Start();
+			// Register callback
+			c.ClientSizeChanged += (s, e) =>
+			{
+				RenderViewSize = c.ClientSize;
+				needResize = true;
+			};
+			c.HandleCreated += (s, se) =>
+			{
+				IsEditor = false;
+				CreateDevice(c.ClientSize, c.Handle);
+				Init();
 
-			renderTimer = new Timer();
-			renderTimer.Tick += renderTimer_TickUpdate;
-			renderTimer.Interval = 1;
-			renderTimer.Start();
+				// Dispose
+				c.HandleDestroyed += (_0, _1) =>
+				{
+					this.Dispose();
+				};
+			};
+		}
+
+		public void BindWithWindow(SharpDX.Windows.RenderControl c)
+		{
+			this.Input = new Input();
+			this.Input.Hook(c);
+
+			// Register callback
+			c.ClientSizeChanged += (s, e) =>
+			{
+				RenderViewSize = c.ClientSize;
+				needResize = true;
+			};
+			c.HandleCreated += (s, se) =>
+			{
+				IsEditor = true;
+				CreateDevice(c.ClientSize, c.Handle);
+				Init();
+
+				// Dispose
+				c.HandleDestroyed += (_0, _1) =>
+				{
+					this.Dispose();
+				};
+			};
 		}
 
 		void renderTimer_TickUpdate(object sender, EventArgs e)
 		{
 			if (needResize) ResizeBuffers();
 
-			Input.Update();
-
-			if (Update != null)
-			{
-				Update();
-				SwapChain.Present(0, PresentFlags.None);
-			}
+			LoopUpdate();
+			SwapChain.Present(0, PresentFlags.None);
 		}
 
-		void CreateDevice()
+		void CreateDevice(System.Drawing.Size size, IntPtr hwnd)
 		{
-			var RenderViewSize = this.ClientSize;
-			var ControlHandle = this.Handle;
+			RenderViewSize = size;
+			ControlHandle = hwnd;
 
 			//create device and swapchain
 			DriverType driverType = DriverType.Hardware;
@@ -101,10 +132,12 @@ namespace Lilium.Controls
 			var factory = SwapChain.GetParent<Factory>();
 			factory.MakeWindowAssociation(ControlHandle, WindowAssociationFlags.IgnoreAll);
 
-			// Register callback
-			Resize += (a, b) => needResize = true;
-			
 			ResizeBuffers();
+
+			renderTimer = new Timer();
+			renderTimer.Tick += renderTimer_TickUpdate;
+			renderTimer.Interval = 1;
+			renderTimer.Start();
 		}
 
 		void ResizeBuffers()
@@ -113,11 +146,11 @@ namespace Lilium.Controls
 			Utilities.Dispose(ref _backbufferView);
 			Utilities.Dispose(ref _zbufferView);
 
-			if (ClientSize.Width == 0 || ClientSize.Height == 0)
+			if (RenderViewSize.Width == 0 || RenderViewSize.Height == 0)
 				return;
 
 			// Resize the backbuffer
-			SwapChain.ResizeBuffers(1, ClientSize.Width, ClientSize.Height, Format.R8G8B8A8_UNorm, SwapChainFlags.AllowModeSwitch);
+			SwapChain.ResizeBuffers(1, RenderViewSize.Width, RenderViewSize.Height, Format.R8G8B8A8_UNorm, SwapChainFlags.AllowModeSwitch);
 
 			// Get the backbuffer from the swapchain
 			var _backBufferTexture = SwapChain.GetBackBuffer<Texture2D>(0);
@@ -135,8 +168,8 @@ namespace Lilium.Controls
 				Format = Format.D24_UNorm_S8_UInt,
 				ArraySize = 1,
 				MipLevels = 1,
-				Width = ClientSize.Width,
-				Height = ClientSize.Height,
+				Width = RenderViewSize.Width,
+				Height = RenderViewSize.Height,
 				SampleDescription = new SampleDescription(Config.MSAASampleCount, Config.MSAAQuality),
 				Usage = ResourceUsage.Default,
 				BindFlags = BindFlags.DepthStencil,
@@ -150,23 +183,20 @@ namespace Lilium.Controls
 			_zbufferView.DebugName = "Lilium DepthStencilBuffer View";
 			_zbufferTexture.Dispose();
 
-			DeviceContext.Rasterizer.SetViewport(0, 0, ClientSize.Width, ClientSize.Height);
+			DeviceContext.Rasterizer.SetViewport(0, 0, RenderViewSize.Width, RenderViewSize.Height);
 			DeviceContext.OutputMerger.SetTargets(_zbufferView, _backbufferView);
 
 			needResize = false;
 		}
 
-		protected override void Dispose(bool disposing)
+		void Dispose_Device()
 		{
-			if (WillDispose != null) WillDispose();
-			
-			_backbufferView.Dispose();
-			_zbufferView.Dispose();
+			Utilities.Dispose(ref _backbufferView);
+			Utilities.Dispose(ref _zbufferView);
 			DeviceContext.Dispose();
 			Device.Dispose();
 			SwapChain.Dispose();
 			renderTimer.Dispose();
-			base.Dispose(disposing);
 		}
 	}
 }

@@ -32,7 +32,6 @@ namespace Lilium
 
 		public UILabel()
 		{
-			Scale = 0.5f;
 		}
 
 		public void SetFont(string fontName)

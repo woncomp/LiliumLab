@@ -8,6 +8,7 @@ using SharpDX.Direct3D;
 using SharpDX.Direct3D11;
 using SharpDX.Windows;
 using SharpDX.DXGI;
+using System.Windows.Forms;
 
 namespace Lilium
 {
@@ -33,7 +34,7 @@ namespace Lilium
 			CreateBlendStates();
 			CreateRasterizerStates();
 
-			DefaultViewport = new Viewport(0, 0, RenderControl.ClientSize.Width, RenderControl.ClientSize.Height);
+			DefaultViewport = new Viewport(0, 0, RenderViewSize.Width, RenderViewSize.Height);
 		}
 		
 		void CreateSamplerStates()

@@ -41,7 +41,7 @@ namespace Lilium
 		private int previewIndex = 0;
 
 		public RenderTexture(Game game, int mrtCount = 1, string debugName = null)
-			: this(game, game.RenderControl.ClientRectangle.Width, game.RenderControl.ClientRectangle.Height, mrtCount, debugName)
+			: this(game, game.RenderViewSize.Width, game.RenderViewSize.Height, mrtCount, debugName)
 		{ }
 
 		public RenderTexture(Game game, int width, int height, int mrtCount = 1, string debugName = null)

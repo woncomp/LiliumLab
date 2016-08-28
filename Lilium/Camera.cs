@@ -59,8 +59,8 @@ namespace Lilium
 
 			ViewMatrix = Matrix.LookAtLH(Position, FocusPoint, Vector3.Up);
 
-			var client = Game.Instance.RenderControl.ClientRectangle;
-			var ratio = client.Width / (float)client.Height;
+			var renderViewSize = Game.Instance.RenderViewSize;
+			var ratio = renderViewSize.Width / (float)renderViewSize.Height;
 			ProjectionMatrix = Matrix.PerspectiveFovLH(MathUtil.DegreesToRadians(FovDegrees), ratio, NearPlane, FarPlane);
 
 			//if(ClearColorBuffer)

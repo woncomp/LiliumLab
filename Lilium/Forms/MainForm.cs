@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharpDX.Windows;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -14,10 +15,8 @@ namespace Lilium
 	{
 		public static MainForm Instance;
 
-		public Lilium.Controls.RenderControl RenderControl;
-
-		public Action<ISelectable> SelectedObjectChanged;
-
+		public RenderControl RenderControl;
+		
 		private Game game;
 
 		public MainForm(Game game)
@@ -38,43 +37,22 @@ namespace Lilium
 		{
 			base.OnCreateControl();
 
-			this.RenderControl = new Lilium.Controls.RenderControl();
-			this.RenderControl.Dock = DockStyle.Fill;
-			this.splitContainer1.Panel1.Controls.Add(RenderControl);
+			this.RenderControl = new RenderControl();
 
 			if (game != null)
 			{
-				this.game.RenderControl = this.RenderControl;
-
-				var timer = new Timer();
-				timer.Interval = 100;
-				timer.Tick += timer_Tick;
-				timer.Start();
+				game.BindWithWindow(RenderControl);
 			}
-		}
-
-		void timer_Tick(object sender, EventArgs e)
-		{
-			var timer = sender as Timer;
-			timer.Stop();
-			timer.Dispose();
-
-			RenderControl.Start += game.Init;
-			RenderControl.Update += game.LoopUpdate;
-			RenderControl.WillDispose += game.Dispose;
-
-			RenderControl.Startup();
+			this.RenderControl.Dock = DockStyle.Fill;
+			this.splitContainer1.Panel1.Controls.Add(RenderControl);
 		}
 
 		private void lbObjects_SelectedIndexChanged(object sender, EventArgs e)
 		{
-			if (SelectedObjectChanged != null)
-			{
-				var item = lbObjects.SelectedItem as ListBoxItem;
-				ISelectable obj =  null;
-				if(item != null)obj = item.target;
-				SelectedObjectChanged(obj);
-			}
+			var item = lbObjects.SelectedItem as ListBoxItem;
+			ISelectable obj = null;
+			if (item != null) obj = item.target;
+			game.Info_SetSelcectedObject(obj);
 		}
 
 		class ListBoxItem

@@ -20,12 +20,14 @@ namespace LiliumLab
 		protected override void OnStart()
 		{
 			ResourceManager.SearchPaths.Add("../../Test");
+			ResourceManager.SearchPaths.Add("../../Anim");
 
 			//var path = System.IO.Path.Combine(Game.Instance.ResourceManager.FirstSearchFolder, "MainScene.txt");
 			//if (System.IO.File.Exists(path))
 			//	MainScene.Load(path);
 
 			mFPSLabel = new UILabel();
+			mFPSLabel.Scale = 0.5f;
 			mFPSLabel.SetFont("font.fnt");
 			UI.AddWidget(mFPSLabel);
 

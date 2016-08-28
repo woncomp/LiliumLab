@@ -9,6 +9,7 @@ using SharpDX.DXGI;
 
 using Device = SharpDX.Direct3D11.Device;
 using Buffer = SharpDX.Direct3D11.Buffer;
+using System.Windows.Forms;
 
 namespace Lilium
 {
@@ -16,49 +17,24 @@ namespace Lilium
 	{
 		public static Game Instance { get; private set; }
 
-		public static void Run<GameT>() where GameT : Game, new()
-		{
-			if (!Device.IsSupportedFeatureLevel(FeatureLevel.Level_11_0))
-			{
-				System.Windows.Forms.MessageBox.Show("DirectX11 Not Supported");
-				return;
-			}
-
-			Game.Instance = new GameT();
-			var form = new MainForm(Game.Instance);
-
-			System.Windows.Forms.Application.Run(form);
-		}
-
-		public System.Drawing.Size RenderViewSize
-		{
-			get { return RenderControl.ClientSize; }
-		}
-		public IntPtr ControlHandle
-		{
-			get { return RenderControl.Handle; }
-		}
-
-		public Device Device { get { return this.RenderControl.Device; } }
-		public DeviceContext DeviceContext { get { return RenderControl.DeviceContext; } }
-
-		public RenderTargetView DefaultRenderTargetView { get { return RenderControl.DefaultRenderTargetView; } }
-		public DepthStencilView DefaultDepthStencilView { get { return RenderControl.DefaultDepthStencilView; } }
-
-		public Input Input { get { return RenderControl.Input; } }
+		public Input Input { get; private set; }
 		public ResourceManager ResourceManager { get; private set; }
 		public UISurface UI { get { return mUISurface;  } }
 
 		public Scene MainScene;
 		public SkyBox SkyBox;
 		public StencilShadowRenderer StencilShadowRenderer;
-		public Lilium.Controls.RenderControl RenderControl;
 
 		private LineRenderer debugLine;
 		private Grid grid;
 		private Skydome skydome;
 		private UISurface mUISurface;
 		private List<IDisposable> _disposeList = new List<IDisposable>();
+
+		public Game()
+		{
+			Instance = this;
+		}
 		
 		public void AutoDispose(IDisposable disposeable)
 		{
@@ -76,7 +52,6 @@ namespace Lilium
 			this.ResourceManager.SearchPaths.Add("../../../InternalAssets/");
 			this.ResourceManager.SearchPaths.Add("./");
 			this.ResourceManager.Init();
-			Info_Init();
 			Time_Init();
 			InitShaderBuffers();
 
@@ -110,6 +85,8 @@ namespace Lilium
 
 		public void LoopUpdate()
 		{
+			Input.Update();
+
 			Light.MainLight.Update();
 			Time_Update(true);
 
@@ -144,6 +121,7 @@ namespace Lilium
 				_disposeList[i].Dispose();
 			}
 			ResourceManager.Dispose();
+			Dispose_Device();
 		}
 
 #region UpdateShaderBuffer

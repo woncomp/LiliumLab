@@ -22,15 +22,10 @@ namespace Lilium
 		private List<Control> selectedObjectControls = new List<Control>();
 
 		private ISelectable selectedObject;
-
-		void Info_Init()
-		{
-			MainForm.Instance.SelectedObjectChanged += Info_SetSelcectedObject;
-
-		}
-
+		
 		void Info_Scan()
 		{
+			if (!IsEditor) return;
 			var obj = this;
 			var gameType = obj.GetType();
 			var members = gameType.GetMembers(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
@@ -56,7 +51,7 @@ namespace Lilium
 			if (preview != null) preview.PreviewDraw();
 		}
 
-		void Info_SetSelcectedObject(ISelectable obj)
+		public void Info_SetSelcectedObject(ISelectable obj)
 		{
 			var preview = selectedObject as IPreviewable;
 			if (preview != null) preview.PreviewDeactive();
@@ -99,13 +94,13 @@ namespace Lilium
 
 		public void AddObject(ISelectable obj)
 		{
-			if (obj == null) return;
+			if (obj == null || !IsEditor) return;
 			MainForm.Instance.AddObject(obj);
 		}
 
 		public void AddResource(SharpDX.Direct3D11.ShaderResourceView texture)
 		{
-			if (texture == null) return;
+			if (texture == null || !IsEditor) return;
 			if (texture.Description.Dimension == SharpDX.Direct3D.ShaderResourceViewDimension.TextureCube)
 			{
 				MainForm.Instance.AddObject(new CubemapPreview(this, texture));
