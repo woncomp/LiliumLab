@@ -14,4 +14,11 @@ namespace LiliumFbx {
 		return output;
 	}
 
+	FBXVector3 ConvertUV(FbxVector2& v)
+	{
+		FBXVector3 output;
+		output.X = (float)v.mData[0];
+		output.Y = 1-(float)v.mData[1];
+		return output;
+	}
 }

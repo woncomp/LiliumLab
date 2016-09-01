@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lilium", "Lilium\Lilium.csp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LiliumLab", "LiliumLab\LiliumLab.csproj", "{1200FEE2-7908-4F97-B8F3-3F5DEF2627AA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LiliumFbx", "W:\LiliumLab\LiliumFbx\LiliumFbx.vcxproj", "{E169D7DB-3EE4-4ADD-ADB7-513BB9F5B5EF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LiliumFbx", "LiliumFbx\LiliumFbx.vcxproj", "{E169D7DB-3EE4-4ADD-ADB7-513BB9F5B5EF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Cyotek.Drawing.BitmapFont", "BitmapFontParser\Cyotek.Drawing.BitmapFont.csproj", "{A8E42972-0BC3-4F26-99DF-87B6379E875F}"
 EndProject

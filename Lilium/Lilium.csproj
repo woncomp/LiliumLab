@@ -69,6 +69,9 @@
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="YamlDotNet">
+      <HintPath>..\packages\YamlDotNet.3.9.0\lib\net35\YamlDotNet.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Game_Device.cs" />
@@ -274,7 +277,7 @@
       <Project>{a8e42972-0bc3-4f26-99df-87b6379e875f}</Project>
       <Name>Cyotek.Drawing.BitmapFont</Name>
     </ProjectReference>
-    <ProjectReference Include="W:\LiliumLab\LiliumFbx\LiliumFbx.vcxproj">
+    <ProjectReference Include="..\LiliumFbx\LiliumFbx.vcxproj">
       <Project>{e169d7db-3ee4-4add-adb7-513bb9f5b5ef}</Project>
       <Name>LiliumFbx</Name>
     </ProjectReference>

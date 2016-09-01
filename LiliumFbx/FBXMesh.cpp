@@ -78,6 +78,7 @@ namespace LiliumFbx {
 
 		mElementNormal = mNativeObject->GetElementNormal(0);
 		mElementTangent = mNativeObject->GetElementTangent(0);
+		mElementUV = mNativeObject->GetElementUV(0);
 
 		for (int polygonIndex = 0; polygonIndex < polygonCount; ++polygonIndex)
 		{
@@ -92,12 +93,16 @@ namespace LiliumFbx {
 				vertex.Position = ConvertVector(pCtrlPoint);
 				if (mElementNormal != NULL) vertex.Normal = ReadNormal(ctrlPointIndex, vertexCounter);
 				if (mElementTangent != NULL) vertex.Tangent = ReadTangent(ctrlPointIndex, vertexCounter);
+				if (mElementUV != NULL) vertex.TexCoord0 = ReadUV(ctrlPointIndex, mNativeObject->GetTextureUVIndex(polygonIndex, positionInPolygon));
 				
 				auto boneWeightList = ctrlPointBoneWeights[ctrlPointIndex];
-				if (boneWeightList->Count > 0) vertex.Weight0 = boneWeightList[0];
-				if (boneWeightList->Count > 1) vertex.Weight1 = boneWeightList[1];
-				if (boneWeightList->Count > 2) vertex.Weight2 = boneWeightList[2];
-				if (boneWeightList->Count > 3) vertex.Weight3 = boneWeightList[3];
+				if (boneWeightList != nullptr)
+				{
+					if (boneWeightList->Count > 0) vertex.Weight0 = boneWeightList[0];
+					if (boneWeightList->Count > 1) vertex.Weight1 = boneWeightList[1];
+					if (boneWeightList->Count > 2) vertex.Weight2 = boneWeightList[2];
+					if (boneWeightList->Count > 3) vertex.Weight3 = boneWeightList[3];
+				}
 
 				Vertices->Add(vertex);
 				Indices->Add(vertexCounter);
@@ -175,4 +180,52 @@ namespace LiliumFbx {
 		return FBXVector3();
 	}
 
+	LiliumFbx::FBXVector3 FBXMesh::ReadUV(int ctrlPointIndex, int textureUVIndex)
+	{
+		auto pElem = mElementUV;
+
+		switch (pElem->GetMappingMode())
+		{
+		case FbxGeometryElement::eByControlPoint:
+		{
+			switch (pElem->GetReferenceMode())
+			{
+			case FbxGeometryElement::eDirect:
+			{
+				return ConvertUV(pElem->GetDirectArray().GetAt(ctrlPointIndex));
+			}
+			break;
+
+			case FbxGeometryElement::eIndexToDirect:
+			{
+				int id = pElem->GetIndexArray().GetAt(ctrlPointIndex);
+				return ConvertUV(pElem->GetDirectArray().GetAt(id));
+			}
+			break;
+
+			default:
+				break;
+			}
+		}
+		break;
+
+		case FbxGeometryElement::eByPolygonVertex:
+		{
+			switch (pElem->GetReferenceMode())
+			{
+			case FbxGeometryElement::eDirect:
+			case FbxGeometryElement::eIndexToDirect:
+			{
+				return ConvertUV(pElem->GetDirectArray().GetAt(textureUVIndex));
+			}
+			break;
+
+			default:
+				break;
+			}
+		}
+		break;
+		}
+		return FBXVector3();
+	}
 }

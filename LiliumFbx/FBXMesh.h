@@ -22,11 +22,13 @@ namespace LiliumFbx {
 	internal:
 		FBXVector3 ReadNormal(int inCtrlPointIndex, int inVertexCounter);
 		FBXVector3 ReadTangent(int inCtrlPointIndex, int inVertexCounter);
+		FBXVector3 ReadUV(int ctrlPointIndex, int textureUVIndex);
 
 	private:
 		FbxMesh* mNativeObject;
 		FbxGeometryElementNormal* mElementNormal;
 		FbxGeometryElementTangent* mElementTangent;
+		FbxGeometryElementUV* mElementUV;
 	};
 
 }

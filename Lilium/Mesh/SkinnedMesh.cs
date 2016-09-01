@@ -146,7 +146,7 @@ namespace Lilium
 
     public class SkinnedSubMesh : IDisposable
 	{
-		public const int MaxBones = 48;
+		public const int MaxBones = 248;
 		public bool SoftwareSkinning = true;
 
         public SkeletonNode Node;
@@ -227,16 +227,26 @@ namespace Lilium
 				{
 					var v0 = originalVertices[i];
 					var matrix = Matrix.Zero;
-					for (int j = 0; j < 4; ++j)
+					if (v0.BoneWeight[0] > 0)
 					{
-						matrix += matBonePalette[v0.BoneIndex[j]] * v0.BoneWeight[j];
+						for (int j = 0; j < 4; ++j)
+						{
+							matrix += matBonePalette[v0.BoneIndex[j]] * v0.BoneWeight[j];
+						}
 					}
+					else
+					{
+						matrix = Node.GlobalTransform;
+					}
+					var invertMatrix = Matrix.Invert(Matrix.Transpose(matrix));
 					var pos = Vector3.TransformCoordinate(v0.Position, matrix);
+					var normal = Vector3.TransformNormal(v0.Normal, invertMatrix);
+					var tangent = Vector3.TransformNormal(v0.Tangent, invertMatrix);
 					var newVertex = new MeshVertex()
 					{
 						Position = pos,
-						Normal = v0.Normal,
-						Tangent = v0.Tangent,
+						Normal = normal,
+						Tangent = tangent,
 						TexCoord = v0.TexCoord,
 					};
 					var oldVertex = vertexBufferData2[i];

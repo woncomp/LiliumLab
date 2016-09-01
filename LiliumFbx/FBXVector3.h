@@ -10,4 +10,5 @@ namespace LiliumFbx {
 	};
 
 	FBXVector3 ConvertVector(FbxVector4& v);
+	FBXVector3 ConvertUV(FbxVector2& v);
 }
