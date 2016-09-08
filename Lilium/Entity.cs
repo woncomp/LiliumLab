@@ -33,6 +33,8 @@ namespace Lilium
 			}
 		}
 
+		public bool DrawSkeleton;
+
 		public Entity(Mesh mesh)
 		{
 			this.Mesh = mesh;
@@ -194,7 +196,8 @@ namespace Lilium
 				    }
 			    }
 
-                DrawSkeletonRecursively(SkinnedMesh.skeleton);
+				if(DrawSkeleton)
+					DrawSkeletonRecursively(SkinnedMesh.skeleton);
             }
 		}
 
@@ -256,20 +259,43 @@ namespace Lilium
 			list.Add(label6);
 			var toggle = new Lilium.Controls.Toggle("Draw Gizmo", () => Config.DrawGizmo, val => Config.DrawGizmo = val);
 			list.Add(toggle);
+			var toggle2 = new Lilium.Controls.Toggle("Draw Skeleton", () => DrawSkeleton, val => DrawSkeleton = val);
+			list.Add(toggle2);
 			var slider = new Lilium.Controls.Slider("Stencil Shadow", 0, 1, () => StencilShadowIndensity, val => StencilShadowIndensity = val);
 			list.Add(slider);
-            if(SkinnedMesh != null && SkinnedMesh.AnimationClips.Count > 0)
+            if(SkinnedMesh != null)
             {
-                foreach (var anim in SkinnedMesh.AnimationClips)
-                {
-                    var animName = anim.Key;
-                    //var anim
-                    var btn = new Lilium.Controls.Button("Play " + animName, ()=>
-                        {
-                            SkinnedMesh.PlayAnimation(animName);
-                        });
-                    list.Add(btn);
-                }
+				if(SkinnedMesh.AnimationComponent != null)
+				{
+					foreach (var pair in SkinnedMesh.AnimationComponent.mStates)
+					{
+						var animStateName = pair.Key;
+						var btn = new Lilium.Controls.Button("State: " + animStateName, () =>
+							{
+								SkinnedMesh.PlayAnimationState(animStateName);
+							});
+						list.Add(btn);
+					};
+					foreach (var pair in SkinnedMesh.AnimationComponent.mParameters)
+					{
+						var param = pair.Value;
+						var sss = new Lilium.Controls.Slider(pair.Key, -1, 1, () => param.Value, v => param.Value = v);
+						list.Add(sss);
+					}
+				}
+				else if (SkinnedMesh.AnimationClips.Count > 0)
+				{
+					foreach (var anim in SkinnedMesh.AnimationClips)
+					{
+						var animName = anim.Key;
+						//var anim
+						var btn = new Lilium.Controls.Button("Play " + animName, () =>
+							{
+								SkinnedMesh.PlayAnimation(animName);
+							});
+						list.Add(btn);
+					}
+				}
             }
             if (Mesh != null)
             {

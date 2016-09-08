@@ -34,9 +34,8 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="AssimpNet, Version=3.2.0.0, Culture=neutral, PublicKeyToken=0d51b391f59f42a6, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\LilyDX\Library\AssimpNet.dll</HintPath>
+    <Reference Include="AssimpNet">
+      <HintPath>..\Library\AssimpNet.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
@@ -74,6 +73,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Components\AnimationComponent.cs" />
     <Compile Include="Game_Device.cs" />
     <Compile Include="Mesh\AnimationClip.cs" />
     <Compile Include="Mesh\AnimationState.cs" />
@@ -186,6 +186,7 @@
     <Compile Include="MaterialSerializing.cs" />
     <Compile Include="MaterialVariable.cs" />
     <Compile Include="MeshPreview.cs" />
+    <Compile Include="Mesh\PersistentAnimationData.cs" />
     <Compile Include="Mesh\SkinnedMeshLoading_Fbxsdk.cs" />
     <Compile Include="Postprocess.cs" />
     <Compile Include="RenderCubemap.cs" />

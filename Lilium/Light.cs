@@ -24,7 +24,7 @@ namespace Lilium
 		public Vector4 DiffuseColor = new Vector4(0.6f, 0.6f, 0.6f, 1);
 
 		public float LightDistance = 10;
-		public float LightYaw = 160;
+		public float LightYaw = 20;
 		public float LightPitch = -45;
 
 		public Light()

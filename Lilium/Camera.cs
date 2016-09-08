@@ -27,7 +27,7 @@ namespace Lilium
 		public Matrix ProjectionMatrix { get; private set; }
 
 		public float CameraDistance = 30;
-		public float CameraYaw = 200;
+		public float CameraYaw = -40;
 		public float CameraPitch = -30;
 
 		//public bool ClearColorBuffer = true;

@@ -114,6 +114,30 @@ namespace Lilium
 			FbxsdkLoadAnimations(scene, clips);
 		}
 
+        public void FbxsdkLoadAnimations(string yamlFileName)
+        {
+			var filePath = System.IO.Path.Combine(System.IO.Path.GetDirectoryName(FbxsdkFilePath), yamlFileName);
+            
+			using (var sr = System.IO.File.OpenText(filePath))
+            { 
+                var data = new YamlDotNet.Serialization.Deserializer().Deserialize<PersistentAnimationData>(sr);
+
+                for(int i=0;i<data.Files.Count;++i)
+                {
+                    var fileInfo = data.Files[i];
+                    var sceneFilePath = Game.Instance.ResourceManager.FindValidResourceFilePath(fileInfo.FileName, "SkinnedMesh");
+                    if(!File.Exists(sceneFilePath)) continue;
+                    var scene = FBXScene.Load(sceneFilePath);
+                    if(scene == null) continue;
+                    FbxsdkLoadAnimations(scene, fileInfo.Clips.Select(c => new AnimationClipCreateInfo(c.AnimationClipName, c.Start, c.End)).ToArray());
+                    scene.Dispose();
+                }
+
+                AnimationComponent = new AnimationComponent(this);
+                AnimationComponent.Load(data);
+            }
+        }
+
 		void FbxsdkLoadAnimations(FBXScene scene, AnimationClipCreateInfo[] clips)
 		{
 			const double FRAMES_PER_SECOND = 30;

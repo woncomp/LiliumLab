@@ -27,11 +27,17 @@ namespace LiliumLab
 			var form = new MainForm(game);
 
 			// Game
-			//var form = new SharpDX.Windows.RenderForm(game.GetType().Name);
-			//form.Size = new System.Drawing.Size(1600, 900);
-			//game.BindWithWindow(form);
+			//var form = CreateGameForm(game);
 
 			System.Windows.Forms.Application.Run(form);
+		}
+
+		static System.Windows.Forms.Form CreateGameForm(Game game)
+		{
+			var form = new SharpDX.Windows.RenderForm(game.GetType().Name);
+			form.Size = new System.Drawing.Size(1600, 900);
+			game.BindWithWindow(form);
+			return form;
 		}
 	}
 }
