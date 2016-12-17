@@ -40,6 +40,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
+    <Compile Include="Bicubic\Bicubic.cs" />
     <Compile Include="Test\TestGame.cs" />
   </ItemGroup>
   <ItemGroup>

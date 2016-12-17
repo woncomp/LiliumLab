@@ -144,6 +144,7 @@ namespace Lilium
 			public Matrix matWorld;
 			public Matrix matWorldInverseTranspose;
 			public Matrix matWorldViewInverseTranspose;
+			public Matrix matWorldViewProjection;
 		}
 
 		public RenderCubemap CurrentCubemap { get; set; }
@@ -157,9 +158,11 @@ namespace Lilium
 		void InitShaderBuffers()
 		{
 			perFrameBuffer = new Buffer(Device, Utilities.SizeOf<LiliumPerFrameData>(), ResourceUsage.Default, BindFlags.ConstantBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+			perFrameBuffer.DebugName = "PerFrameBuffer";
 			AutoDispose(perFrameBuffer);
 
 			perObjectBuffer = new Buffer(Device, Utilities.SizeOf<LiliumPerObjectData>(), ResourceUsage.Default, BindFlags.ConstantBuffer, CpuAccessFlags.None, ResourceOptionFlags.None, 0);
+			perObjectBuffer.DebugName = "PerObjectBuffer";
 			AutoDispose(perObjectBuffer);
 		}
 
@@ -197,6 +200,8 @@ namespace Lilium
 			DeviceContext.UpdateSubresource(ref perFrameData, perFrameBuffer);
 			DeviceContext.VertexShader.SetConstantBuffer(1, perFrameBuffer);
 			DeviceContext.PixelShader.SetConstantBuffer(1, perFrameBuffer);
+			DeviceContext.HullShader.SetConstantBuffer(1, perFrameBuffer);
+			DeviceContext.DomainShader.SetConstantBuffer(1, perFrameBuffer);
 		}
 
 		public void UpdatePerObjectBuffer(Matrix objectTransform)
@@ -204,9 +209,12 @@ namespace Lilium
 			perObjectData.matWorld = objectTransform;
 			perObjectData.matWorldInverseTranspose = Matrix.Invert(Matrix.Transpose(objectTransform));
 			perObjectData.matWorldViewInverseTranspose = Matrix.Invert(Matrix.Transpose(perObjectData.matWorld * perFrameData.matView));
+			perObjectData.matWorldViewProjection = objectTransform * perFrameData.matView * perFrameData.matProjection;
 			DeviceContext.UpdateSubresource(ref perObjectData, perObjectBuffer);
 			DeviceContext.VertexShader.SetConstantBuffer(2, perObjectBuffer);
 			DeviceContext.PixelShader.SetConstantBuffer(2, perObjectBuffer);
+			DeviceContext.HullShader.SetConstantBuffer(2, perObjectBuffer);
+			DeviceContext.DomainShader.SetConstantBuffer(2, perObjectBuffer);
 		}
 #endregion
 	}

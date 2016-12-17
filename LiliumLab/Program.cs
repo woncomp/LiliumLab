@@ -21,7 +21,7 @@ namespace LiliumLab
 				return;
 			}
 			Lilium.Config.DebugMode = true;
-			var game = new TestGame();
+			var game = new Bicubic();
 
 			// Editor
 			var form = new MainForm(game);
