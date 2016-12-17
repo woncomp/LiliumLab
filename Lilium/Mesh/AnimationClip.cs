@@ -58,16 +58,5 @@ namespace Lilium
 		{
 			return l.Items.ToArray();
 		}
-
-        public static implicit operator PersistentAnimationCreateInfo[](AnimationClipCreateInfoList l)
-        {
-            return l.Items.Select(c =>
-                new PersistentAnimationCreateInfo()
-                {
-                    AnimationClipName = c.Name,
-                    Start = c.Start,
-                    End = c.End
-                }).ToArray();
-        }
 	}
 }

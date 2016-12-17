@@ -186,6 +186,10 @@ namespace Lilium
 			DeviceContext.Rasterizer.SetViewport(0, 0, RenderViewSize.Width, RenderViewSize.Height);
 			DeviceContext.OutputMerger.SetTargets(_zbufferView, _backbufferView);
 
+			// Resize UI Surface
+			if(mUISurface != null)
+				mUISurface.SetDesignHeight(RenderViewSize.Height);
+
 			needResize = false;
 		}
 

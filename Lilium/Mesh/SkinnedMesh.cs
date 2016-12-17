@@ -61,10 +61,8 @@ namespace Lilium
         }
 
 #region SkinnedAnimation
-
 		public Dictionary<string, AnimationClip> AnimationClips = new Dictionary<string, AnimationClip>();
         public AnimationState AnimationState;
-        public AnimationComponent AnimationComponent;
 
         public void PlayAnimation(string animName)
         {
@@ -73,27 +71,12 @@ namespace Lilium
 			AnimationState.PlayAnimation(AnimationClips[animName], 1);
         }
         
-        public void PlayAnimationState(string stateName)
-        {
-            if(AnimationComponent==null)return;
-            AnimationComponent.PlayAnimation(stateName, 0.2f);
-        }
 
         public void UpdateSkinning()
 		{
 			foreach (var node in skeletonNodeDict.Values) node.LocalTransform = node.PoseMatrix;
-            
-            // Animating
-            if(AnimationComponent != null)
-            {
-                AnimationComponent.Update(Game.DeltaTime);
-            }
-            else if(AnimationState != null)
-            {
-                AnimationState.Update(Game.DeltaTime);
-            }
+            if(AnimationState != null) AnimationState.Update(Game.DeltaTime);
 
-            // Calculate Transform hierarchy
             foreach (var node in skeleton)
             {
                 node.GlobalTransform = node.LocalTransform;
