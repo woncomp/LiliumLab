@@ -33,5 +33,7 @@ namespace LiliumLab
 
 			System.Windows.Forms.Application.Run(form);
 		}
+
+		//TEST
 	}
 }
