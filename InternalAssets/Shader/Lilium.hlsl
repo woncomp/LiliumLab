@@ -17,6 +17,7 @@ cbuffer LiliumPerObject : register(b2)
 	float4x4 matWorld;
 	float4x4 matWorldInverseTranspose;
 	float4x4 matWorldViewInverseTranspose;
+	float4x4 matWorldViewProjection;
 };
 
 struct VS_IN
